@@ -1,2 +1,2 @@
-# NeuPupAni
-Tests with combining Neural Puppet with animation systems
+# NeuPupRecorder
+Simple animation system using NeuralPuppets https://twitter.com/hashtag/neuralpuppet
