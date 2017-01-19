@@ -4,8 +4,6 @@ import processing.event.*;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 
-import javax.xml.bind.Element;
-
 public class Gui {
 
 	PApplet p;
@@ -60,7 +58,10 @@ public class Gui {
 		
 		boolean button_entered_down = false;
 		
-		String label = "";
+		String current_label = "";
+		String up_label = "";
+		String over_label = "";
+		String down_label = "";
 		
 		Button(PApplet p)
 		{
@@ -71,17 +72,19 @@ public class Gui {
 		@Override
 		void draw()
 		{
-			if(mouse_state == mouse_over) {current_colour = over_colour;}
-			else if(mouse_state == mouse_down) {current_colour = down_colour;}
+			if(mouse_state == mouse_over) {current_colour = over_colour; current_label = over_label;}
+			else if(mouse_state == mouse_down) {current_colour = down_colour; current_label = down_label;}
 			else 
 			{ 
 				if(button_state == button_down)
 				{
 					current_colour = down_colour;
+					current_label = down_label;
 				}
 				else if(button_state == button_up)
 				{
 					current_colour = up_colour;
+					current_label = up_label;
 				}
 			}
 			
@@ -93,15 +96,35 @@ public class Gui {
 			
 			p.fill(255, 255, 255);
 			p.textAlign(PApplet.CENTER, PApplet.CENTER);
-			p.text(label, x+(w/2), y+(h/2)); 
+			p.text(current_label, x+(w/2), y+(h/2)); 
 			
 			p.popStyle();
 		}
 		
 		// Setting attributes
+		Button down_label(String label)
+		{
+			this.down_label = label;
+			return this;
+		}
+		
+		Button over_label(String label)
+		{
+			this.over_label = label;
+			return this;
+		}
+		
+		Button up_label(String label)
+		{
+			this.up_label = label;
+			return this;
+		}
+		
 		Button label(String label)
 		{
-			this.label = label;
+			down_label(label);
+			over_label(label);
+			up_label(label);
 			return this;
 		}
 		
@@ -147,6 +170,18 @@ public class Gui {
 		{
 			int[] new_colour = {r,g,b,a};
 			over_colour = new_colour;
+			return this;
+		}
+		
+		Button on()
+		{
+			button_state = button_down;
+			return this;
+		}
+		
+		Button off()
+		{
+			button_state = button_up;
 			return this;
 		}
 		
@@ -199,13 +234,13 @@ public class Gui {
 				{
 					if(button_state == button_down)
 					{
-						run_function(on_up_function, on_up_object);
 						button_state = button_up;
+						run_function(on_up_function, on_up_object);
 					}
 					else if(button_state == button_up)
 					{
-						run_function(on_down_function, on_down_object);
 						button_state = button_down;
+						run_function(on_down_function, on_down_object);
 					}
 				}
 				else

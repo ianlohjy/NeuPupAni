@@ -12,4 +12,18 @@ public class Utilities {
 		}
 		return false;
 	}
+	
+	static float crop(float value, float limit_low, float limit_high)
+	{
+		if(value > limit_high) {return limit_high;}
+		else if(value < limit_low) {return limit_low;}
+		else {return value;}
+	}
+	
+	static int crop(int value, int limit_low, int limit_high)
+	{
+		if(value > limit_high) {return limit_high;}
+		else if(value < limit_low) {return limit_low;}
+		else {return value;}
+	}
 }

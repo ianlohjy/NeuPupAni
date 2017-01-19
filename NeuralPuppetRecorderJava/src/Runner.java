@@ -1,6 +1,5 @@
 import java.io.File;
 import java.lang.reflect.Method;
-import java.nio.file.Files;
 
 import processing.core.PApplet;
 
@@ -99,7 +98,7 @@ public class Runner {
 		int watch_start;
 		int last_watch;
 		int watch_interval = 1000;
-		int watch_timeout = 10000;
+		int watch_timeout = 30000;
 		
 		public Watch(File file, String callback, Object object)
 		{
