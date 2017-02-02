@@ -1,3 +1,4 @@
+import java.io.File;
 import java.util.ArrayList;
 import processing.core.PVector;
 import processing.data.JSONArray;
@@ -16,27 +17,39 @@ public class AnimData{
 	}
 	
 	// Graphics
-	void draw()
+	void draw(int highlight_to_point)
 	{
+		// highlight_to_point will draw every point up to the given number in the highlight colour
+		
 		if(points != null)
 		{
+			int[] stroke_colour = {255,255,255};
+			
 			p.pushStyle();
 			for(int d=0; d<points.size(); d++)
 			{
-				p.strokeWeight(1);
+				// Determining stroke highlight
+				stroke_colour = new int[] {255,255,255};
+				if(highlight_to_point >= 0 && highlight_to_point >= d){stroke_colour = new int[] {255,0,0};}
+
+				p.strokeWeight(5);
 				
 				if(d == points.size()-1)
 				{
-					p.stroke(255, 50);
+					p.stroke(stroke_colour[0], stroke_colour[1], stroke_colour[2], 50);
 					p.line(points.get(d).x, points.get(d).y, points.get(0).x, points.get(0).y);
 				}
 				else
 				{
-					p.stroke(255);
+					p.stroke(stroke_colour[0], stroke_colour[1], stroke_colour[2]);
 					p.line(points.get(d).x, points.get(d).y, points.get(d+1).x, points.get(d+1).y);
 				}
-				p.fill(0);
-				p.ellipse(points.get(d).x, points.get(d).y,2, 2);
+				p.pushMatrix();
+				p.translate(0, 0, 10);
+				p.noStroke();
+				p.fill(0,0,0);
+				p.ellipse(points.get(d).x, points.get(d).y, 2, 2);
+				p.popMatrix();
 			}
 			p.popStyle();
 		}
@@ -94,7 +107,7 @@ public class AnimData{
 	}
 	
 	// Data
-	void saveToJson()
+	void save_to_json(File save_path)
 	  {
 	    JSONArray  json_points = new JSONArray();
 	    JSONObject json_out = new JSONObject();
@@ -110,15 +123,16 @@ public class AnimData{
 	      json_points.setJSONArray(p, json_point);
 	    }
 	    json_out.setJSONArray("points", json_points);
-	      
-	    p.saveJSONObject(json_out, "Export_" + PApplet.year() + "_" + PApplet.month() + "_" + PApplet.day() + "_" + p.millis() + ".json");
+	     
+	    p.saveJSONObject(json_out, save_path.getAbsolutePath()+".json");
+	    //p.saveJSONObject(json_out, "Export_" + PApplet.year() + "_" + PApplet.month() + "_" + PApplet.day() + "_" + p.millis() + ".json");
 	  }
 	  
-	void loadJson(String file)
+	void load_json(File load_path)
 	{
 		this.clear_points();
 	    
-	    JSONObject data = p.loadJSONObject(file);
+	    JSONObject data = p.loadJSONObject(load_path.getAbsolutePath());
 	    JSONArray data_points = data.getJSONArray("points");
 	    
 	    for(int p=0; p<data_points.size(); p++)

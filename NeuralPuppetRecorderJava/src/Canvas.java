@@ -33,14 +33,14 @@ public class Canvas extends Gui.Element{
 		// Background Image
 		if(a.face_grid != null)
 		{
-			p.tint(150,150,150,100);
 			p.image(a.face_grid, x, y, w, h);
-			p.noTint();
+			p.fill(0, 200);
+			p.rect(x,y,w,h);
 		}
 		p.popStyle();
 		
 		// Recorded Line
-		a.recorded_data.draw();
+		a.recorded_data.draw(a.current_frame);
 		if(a.playback == a.recording)
 		{
 			a.recorded_data.draw_loop();
@@ -54,6 +54,19 @@ public class Canvas extends Gui.Element{
 			p.fill(255,0,0);
 			p.noStroke();
 			p.ellipse(current_frame_point.x, current_frame_point.y, 10, 10);
+			
+			// Drawing a callout with the current frame time
+			String cur_frame_callout = a.current_frame+"";
+			p.pushMatrix();
+			p.translate(0, 0, 10);
+			p.rectMode(p.CENTER);
+			p.fill(0);
+			p.rect(current_frame_point.x, current_frame_point.y-25, p.textWidth(cur_frame_callout), 20);
+			p.fill(255);
+			p.textAlign(p.CENTER, p.CENTER);
+			p.text(cur_frame_callout, current_frame_point.x, current_frame_point.y-25);
+			p.popMatrix();
+			
 			p.popStyle();
 		}
 		

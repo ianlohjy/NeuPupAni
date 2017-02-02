@@ -1,4 +1,5 @@
 import processing.core.*;
+import processing.event.KeyEvent;
 import processing.event.MouseEvent;
 
 public class NeuralPuppetRecorder extends PApplet{
@@ -18,7 +19,7 @@ public class NeuralPuppetRecorder extends PApplet{
 	// GUI Timeline
 	Gui.Button play;
 	
-	public int lol=0;
+	boolean show_framerate = false;
 	
 	public static void main(String args[])
 	{
@@ -28,11 +29,12 @@ public class NeuralPuppetRecorder extends PApplet{
 	// Processing methods
 	public void settings()
 	{
-		size(1000, 550);
+		size(1000, 550, P3D);
 	}
 	
 	public void setup()
 	{
+		frameRate(120);
 		//surface.setResizable(true);	
 		runner = new Runner(this, animation);
 		animation = new Animation(this, runner);
@@ -41,6 +43,7 @@ public class NeuralPuppetRecorder extends PApplet{
 		
 		setup_gui();
 		runner.setup();
+		ortho();
 	}
 	
 	public void draw()
@@ -55,6 +58,15 @@ public class NeuralPuppetRecorder extends PApplet{
 		runner.run();
 		
 		update_gui();
+		
+		if(show_framerate)
+		{
+			pushStyle();
+			fill(0);
+			textAlign(RIGHT, CENTER);
+			text((int)frameRate + " FPS", display.x+display.w-5, display.y+10);
+			popStyle();
+		}
 	}
 	
 	public void check_window_size()
@@ -80,6 +92,20 @@ public class NeuralPuppetRecorder extends PApplet{
 	public void mouseMoved(MouseEvent e)    {mouse_event(e);}
 	public void mousePressed(MouseEvent e)  {mouse_event(e);}
 	public void mouseReleased(MouseEvent e) {mouse_event(e);}
+	public void keyPressed(KeyEvent e)
+	{
+		if(e.getKeyCode() == 70) // F key
+		{
+			if(show_framerate)
+			{
+				show_framerate = false;
+			}
+			else
+			{
+				show_framerate = true;
+			}
+		}
+	}
 	
 	// GUI
 	public void setup_gui()
@@ -94,9 +120,11 @@ public class NeuralPuppetRecorder extends PApplet{
 		
 		load_json.height(25).label("LOAD JSON");
 		load_json.down_colour(0,0,0,255).up_colour(150,150,150,255).over_colour(50,50,50,255);
+		load_json.on_down_function("select_load_path", animation);
 		
 		save_json.height(25).label("SAVE JSON");
 		save_json.down_colour(0,0,0,255).up_colour(150,150,150,255).over_colour(50,50,50,255);
+		save_json.on_down_function("select_save_path", animation);
 		
 		load_face.height(25).label("LOAD FACE");
 		load_face.down_colour(0,0,0,255).up_colour(150,150,150,255).over_colour(50,50,50,255);
@@ -140,13 +168,11 @@ public class NeuralPuppetRecorder extends PApplet{
 			float timeline_width = (width-play.w) * (animation.current_frame+1) / (float)animation.recorded_data.size();
 
 			pushStyle();
-			fill(255,50,0);
+			fill(255,0,0);
 			noStroke();
 			rectMode(CORNER);
 			rect(play.x+play.w, play.y, timeline_width, play.h);
 			popStyle();
 		}
 	}
-	
-	
 }

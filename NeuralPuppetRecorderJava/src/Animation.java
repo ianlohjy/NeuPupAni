@@ -143,11 +143,37 @@ public class Animation {
 		}
 	}
 	
+	// Saving & Loading
+	public void select_save_path()
+	{
+		p.selectOutput("Saving file", "save", null, this);
+	}
+	
+	public void select_load_path()
+	{
+		p.selectInput("Load a json file", "load", null, this);
+	}
+	
+	public void save(File save_path)
+	{
+		if(save_path != null)
+		{
+			recorded_data.save_to_json(save_path);
+		}
+	}
+	
+	public void load(File load_path)
+	{
+		if(load_path != null)
+		{
+			recorded_data.load_json(load_path);
+		}
+	}
+	
 	// Image IO  handling
 	public void get_face()
 	{
-		System.out.println("HI");
-		p.selectInput("Select a file to process:", "face_selected", null, this);
+		p.selectInput("Select an image to animate", "face_selected", null, this);
 	}
 	
 	public void face_selected(File selection)
@@ -178,6 +204,7 @@ public class Animation {
 			}
 		}
 	}
+
 	
 	public void grid_done_processing(File file)
 	{
