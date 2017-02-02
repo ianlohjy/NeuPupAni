@@ -2,6 +2,7 @@ import java.io.File;
 import java.lang.reflect.Method;
 
 import processing.core.PApplet;
+import processing.core.PImage;
 
 // Runner is in charge of resource management
 // and communicating with Neural Pupppet
@@ -17,6 +18,8 @@ public class Runner {
 	
 	String input_folder_name = "_input";
 	String watch_folder_name = "_watch";
+	File input_folder;
+	File watch_folder; 
 	
 	// Watch
 	Watch watcher;
@@ -52,6 +55,17 @@ public class Runner {
 		watcher = new Watch(file_to_watch, callback, object);
 	}
 	
+	// Directory setup
+	public void set_input_folder(String input_directory)
+	{
+		input_folder = new File(input_directory);
+	}
+	
+	public void set_watch_folder(String watch_directory)
+	{
+		watch_folder = new File(watch_directory);
+	}
+	
 	public void setup_directories()
 	{
 		// Gets the directory where your program started 
@@ -60,20 +74,23 @@ public class Runner {
 		working_directory = working_directory.substring(0,working_directory.length()-1);
 		System.out.println("Running from directory: " + working_directory);
 		
-		
 		// Checking if folders exist
 		// Setting directories
 		input_directory = working_directory + input_folder_name;
 		watch_directory = working_directory + watch_folder_name;
 		
-		File input_folder = new File(input_directory);
-		File watch_folder = new File(watch_directory);
+		// Temporary override to Tom's pipeline directory
+		input_directory = "N:\\pipeline\\inputs";
+		watch_directory = "N:\\pipeline\\enhanced";
+		
+		input_folder = new File(input_directory);
+		watch_folder = new File(watch_directory);
 		
 		if(!input_folder.exists()) {input_folder.mkdir();}
 		if(!watch_folder.exists()) {watch_folder.mkdir();}
 		
-		empty_folder(input_folder);
-		empty_folder(watch_folder);
+		//empty_folder(input_folder);
+		//empty_folder(watch_folder);
 	}
 	
 	// Folder Operations
@@ -100,9 +117,21 @@ public class Runner {
 		int watch_interval = 1000;
 		int watch_timeout = 30000;
 		
+		/*
 		public Watch(File file, String callback, Object object)
 		{
+			
+		}
+		*/
+		
+		public Watch(File file, String callback, Object object)
+		{
+			// Override file watching to .png file
+			String original_file = file.getAbsolutePath();
+			String expected_file = original_file.substring(0, original_file.lastIndexOf('.')) + ".png"; 
+			
 			this.file = file;
+			this.file = new File(expected_file);
 			watch_start = p.millis();
 			last_watch = 0;
 			this.object = object;
@@ -118,13 +147,12 @@ public class Runner {
 				{
 					System.out.println("Watcher watching for " + file.getAbsolutePath());
 					
-					if(file.exists())
+					if(file.exists() && file_is_fine(file))
 					{
 						System.out.println("Watcher found file! " + file.getAbsolutePath());
 						run_callback();
 						Runner.this.stop_watch();
 					}
-					
 					last_watch = p.millis();
 				}
 			}
@@ -132,6 +160,21 @@ public class Runner {
 			{
 				System.out.println("Watcher timed out!");
 				Runner.this.stop_watch();
+			}
+		}
+		
+		public boolean file_is_fine(File file)
+		{
+			try
+			{
+				PImage check_image = p.loadImage(file.getAbsolutePath());
+				return true;
+			}
+			catch(Exception e)
+			{
+				p.println("Found watch file is not valid");
+				e.printStackTrace();
+				return false;
 			}
 		}
 		

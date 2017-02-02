@@ -178,8 +178,10 @@ public class Animation {
 	
 	public void face_selected(File selection)
 	{
+		//String file_path = selection.getAbsolutePath();
 		String file_format = selection.toString().substring(selection.toString().lastIndexOf('.'), selection.toString().length()).toLowerCase();
-		
+		//String file_wo_format = file_path.substring(0, file_path.lastIndexOf('.'));
+				
 		if(file_format.equals(".gif") || file_format.equals(".jpg") || file_format.equals(".png") || file_format.equals(".tga"))
 		{
 			System.out.println("Found file compatible file format: " + file_format);
@@ -187,9 +189,10 @@ public class Animation {
 			// Load Face image as PImage
 			face_input = p.loadImage(selection.getAbsolutePath());
 			
-			String filename_to_process = p.millis() + file_format;
-			File copy_file = new File(r.input_directory + File.separator + filename_to_process);
-			File result_file = new File(r.watch_directory + File.separator + filename_to_process);
+			String working_filename = Integer.toString(p.millis());
+			
+			File copy_file = new File(r.input_directory + File.separator + working_filename + file_format);
+			File result_file = new File(r.watch_directory + File.separator + working_filename + file_format);
 			
 			System.out.println("Copying file as " + copy_file);
 			
@@ -205,13 +208,20 @@ public class Animation {
 		}
 	}
 
-	
 	public void grid_done_processing(File file)
 	{
 		System.out.println("Grid Processed: " + file.getAbsolutePath());
-		face_grid = p.loadImage(file.getAbsolutePath());
-		face_grid_shape[0] = 7;
-		face_grid_shape[1] = 7;
+		try
+		{
+			face_grid = p.loadImage(file.getAbsolutePath());
+			face_grid_shape[0] = 7;
+			face_grid_shape[1] = 7;
+		}
+		catch(Exception e)
+		{
+			p.println("Encountered error while loading image grid");
+			e.printStackTrace();
+		}
 	}
 	
 	public PVector get_current_playback_position()
