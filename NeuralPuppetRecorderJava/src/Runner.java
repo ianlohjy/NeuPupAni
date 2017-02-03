@@ -32,11 +32,11 @@ public class Runner {
 	
 	public void setup()
 	{
-		if(false) // set to false for debugging
+		if(true) // set to false for debugging
 		{
 			//Tom's pipeline directory
 			set_input_folder("N:\\pipeline\\inputs");
-			set_watch_folder("N:\\pipeline\\enchanced");
+			set_watch_folder("N:\\pipeline\\enhanced");
 		}
 		else
 		{
@@ -138,7 +138,10 @@ public class Runner {
 			{
 				if((p.millis() - last_watch) > 1000)
 				{
-					System.out.println("Watcher watching for " + file.getAbsolutePath());
+					//String file_path = file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf("."));
+					//File watched_file = new File(file_path + ".png");
+					
+					//System.out.println("Watcher watching for " + watched_file.getAbsolutePath());
 					
 					File watched_file = check_for_file(file);
 					
@@ -161,16 +164,16 @@ public class Runner {
 		public File check_for_file(File file)
 		{
 			File checked_file = check_for_file_format(file, ".png");
-			if(checked_file != null) {return checked_file;}
+			if(checked_file != null) {p.println("found .png!"); return checked_file;}
 			
 			checked_file = check_for_file_format(file, ".jpg");
-			if(checked_file != null) {return checked_file;}
+			if(checked_file != null) {p.println("found .jpg!"); return checked_file;}
 
 			checked_file = check_for_file_format(file, ".gif");
-			if(checked_file != null) {return checked_file;}
+			if(checked_file != null) {p.println("found .gif!"); return checked_file;}
 			
 			checked_file = check_for_file_format(file, ".tga");
-			if(checked_file != null) {return checked_file;}
+			if(checked_file != null) {p.println("found .tga!"); return checked_file;}
 			
 			return null;
 		}
@@ -180,8 +183,11 @@ public class Runner {
 			String file_path = file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf("."));
 			File check_file = new File(file_path + format);
 			
+			p.println("Watching for: " + check_file.getAbsolutePath());
+			
 			if(check_file.exists())
 			{
+				p.println("Found it!");
 				return check_file;
 			}
 			else
