@@ -10,13 +10,6 @@ import processing.core.PImage;
 public class Runner {
 	public PApplet p;
 	public Animation a;
-
-	// Folders
-	//String working_directory = "";
-	//String input_directory = "";
-	//String watch_directory = "";
-	
-	
 	
 	File input_folder;
 	File watch_folder; 
@@ -32,7 +25,7 @@ public class Runner {
 	
 	public void setup()
 	{
-		if(true) // set to false for debugging
+		if(false) // set to false for debugging
 		{
 			//Tom's pipeline directory
 			set_input_folder("N:\\pipeline\\inputs");
@@ -47,6 +40,9 @@ public class Runner {
 			
 			set_input_folder(working_directory + "_input");
 			set_watch_folder(working_directory + "_watch");
+			
+			empty_folder(input_folder);
+			empty_folder(watch_folder);
 		}
 	}
 	

@@ -1,4 +1,6 @@
 import java.io.File;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.nio.file.Files;
 
 import processing.core.PApplet;
@@ -176,6 +178,11 @@ public class Animation {
 		p.selectInput("Select an image to animate", "face_selected", null, this);
 	}
 	
+	public void get_grid()
+	{
+		p.selectInput("Select an grid to load", "grid_done_processing", null, this);
+	}
+	
 	public void face_selected(File selection)
 	{
 		//String file_path = selection.getAbsolutePath();
@@ -189,7 +196,31 @@ public class Animation {
 			// Load Face image as PImage
 			face_input = p.loadImage(selection.getAbsolutePath());
 			
-			String working_filename = Integer.toString(p.millis());
+			String mac_address = "";
+			try
+			{
+				InetAddress address = InetAddress.getLocalHost();
+				NetworkInterface nwi = NetworkInterface.getByInetAddress(address);
+				byte mac[] = nwi.getHardwareAddress();
+				mac_address = mac.toString();
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+			
+			String file_name = selection.getName();
+			file_name = file_name.substring(0, file_name.lastIndexOf("."));
+			
+			/*
+			String working_filename = Integer.toString(p.year())   +
+									  Integer.toString(p.month())  +
+									  Integer.toString(p.day())    +
+									  Integer.toString(p.minute()) +
+								      Integer.toString(p.millis()) + 
+								      mac_address;
+			*/
+			String working_filename = file_name + "_" + Long.toString(System.currentTimeMillis());// + mac_address;
 			
 			File copy_file = new File(r.input_folder().getAbsolutePath() + File.separator + working_filename + file_format);
 			File result_file = new File(r.watch_folder().getAbsolutePath() + File.separator + working_filename + file_format);

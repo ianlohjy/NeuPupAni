@@ -12,12 +12,14 @@ public class NeuralPuppetRecorder extends PApplet{
 	// GUI
 	Gui gui;
 	// GUI Menu Bar
+	Gui.Button load_grid;
 	Gui.Button save_json;
 	Gui.Button load_json;
 	Gui.Button load_face;
 	Gui.Button render;
 	// GUI Timeline
 	Gui.Button play;
+	Gui.Slider timeline;
 	
 	boolean show_framerate = false;
 	
@@ -112,11 +114,17 @@ public class NeuralPuppetRecorder extends PApplet{
 	{
 		gui = new Gui(this);
 		
+		load_grid = gui.button();
 		load_json = gui.button();
 		save_json = gui.button();
 		load_face = gui.button();
 		play = gui.button();
 		render = gui.button();
+		timeline = gui.slider();
+		
+		load_grid.height(25).label("LOAD GRID");
+		load_grid.down_colour(0,0,0,255).up_colour(150,150,150,255).over_colour(50,50,50,255);
+		load_grid.on_down_function("get_grid", animation);
 		
 		load_json.height(25).label("LOAD JSON");
 		load_json.down_colour(0,0,0,255).up_colour(150,150,150,255).over_colour(50,50,50,255);
@@ -136,6 +144,8 @@ public class NeuralPuppetRecorder extends PApplet{
 		play.height(25).label("PLAY").set_toggle();
 		play.down_colour(0,0,0,255).up_colour(150,150,150,255).over_colour(50,50,50,255);
 		play.on_down_function("play", animation).on_up_function("stop", animation);
+	
+		//timeline.height(25);
 	}
 	
 	public void play_button_play()
@@ -152,14 +162,18 @@ public class NeuralPuppetRecorder extends PApplet{
 	
 	public void update_gui()
 	{
-		int top_division = (int)width/4;
-		load_json.x(0).y(0).width(top_division);
-		save_json.x(top_division*1).y(0).width(top_division);
-		load_face.x(top_division*2).y(0).width(top_division);
-		render.x(top_division*3).y(0).width(top_division);
+		int top_division_right = (int)width/4;
+		int top_division_left = (width/6) + 1;
+		
+		load_grid.x(0).y(0).width(top_division_left);
+		load_json.x(top_division_left*1).y(0).width(top_division_left);
+		save_json.x(top_division_left*2).y(0).width(top_division_left);
+		load_face.x(top_division_right*2).y(0).width(top_division_right);
+		render.x(top_division_right*3).y(0).width(top_division_right);
 		
 		int bottom_division = (int)width/4;
 		play.x(0).y(25+(int)canvas.h).width(bottom_division);
+		timeline.x(width/2+50).y(150).width(250);
 		
 		gui.draw();
 		

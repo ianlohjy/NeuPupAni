@@ -33,14 +33,16 @@ public class Gui {
 	
 	Button button()
 	{
-		Button test_button = new Button(p);
-		elements.add(test_button);
-		return test_button;
+		Button new_button = new Button(p);
+		elements.add(new_button);
+		return new_button;
 	}
 	
 	Slider slider()
 	{
-		return null;
+		Slider new_slider = new Slider(p);
+		elements.add(new_slider);
+		return new_slider;
 	}
 	
 	public class Slider extends Element
@@ -57,6 +59,18 @@ public class Gui {
 			super(0, 0, 0, 0, p);
 		}
 		
+		@Override
+		void draw()
+		{
+			p.pushStyle();
+			p.fill(0);
+			p.noStroke();
+			p.rectMode(PApplet.CORNER);
+			p.rect(x, y, w, h);
+			p.popStyle();
+		}
+		
+		// Setting Attributes
 		Slider label(String label)
 		{
 			this.label = label;
