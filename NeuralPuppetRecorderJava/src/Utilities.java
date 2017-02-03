@@ -1,3 +1,4 @@
+import java.io.File;
 
 public class Utilities {
 
@@ -25,5 +26,11 @@ public class Utilities {
 		if(value > limit_high) {return limit_high;}
 		else if(value < limit_low) {return limit_low;}
 		else {return value;}
+	}
+	
+	static String get_format(File file)
+	{
+		String file_path = file.getAbsolutePath();
+		return file_path.substring(file_path.lastIndexOf('.'), file_path.length()-1);
 	}
 }

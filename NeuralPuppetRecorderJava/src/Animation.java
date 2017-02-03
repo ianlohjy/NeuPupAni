@@ -191,8 +191,8 @@ public class Animation {
 			
 			String working_filename = Integer.toString(p.millis());
 			
-			File copy_file = new File(r.input_directory + File.separator + working_filename + file_format);
-			File result_file = new File(r.watch_directory + File.separator + working_filename + file_format);
+			File copy_file = new File(r.input_folder().getAbsolutePath() + File.separator + working_filename + file_format);
+			File result_file = new File(r.watch_folder().getAbsolutePath() + File.separator + working_filename + file_format);
 			
 			System.out.println("Copying file as " + copy_file);
 			

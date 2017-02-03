@@ -12,12 +12,12 @@ public class Runner {
 	public Animation a;
 
 	// Folders
-	String working_directory = "";
-	String input_directory = "";
-	String watch_directory = "";
+	//String working_directory = "";
+	//String input_directory = "";
+	//String watch_directory = "";
 	
-	String input_folder_name = "_input";
-	String watch_folder_name = "_watch";
+	
+	
 	File input_folder;
 	File watch_folder; 
 	
@@ -32,7 +32,22 @@ public class Runner {
 	
 	public void setup()
 	{
-		setup_directories();
+		if(false)
+		{
+			//Tom's pipeline directory
+			set_input_folder("N:\\pipeline\\inputs");
+			set_watch_folder("N:\\pipeline\\enchanced");
+		}
+		else
+		{
+			// Gets the directory where your program started 
+			// http://stackoverflow.com/questions/17540942/how-to-get-the-path-of-running-java-program#answer-17541023
+			String working_directory = new File(".").getAbsolutePath();
+			working_directory = working_directory.substring(0,working_directory.length()-1);
+			
+			set_input_folder(working_directory + "_input");
+			set_watch_folder(working_directory + "_watch");
+		}
 	}
 	
 	public void run()
@@ -59,41 +74,31 @@ public class Runner {
 	public void set_input_folder(String input_directory)
 	{
 		input_folder = new File(input_directory);
+		check_folder_exists(input_folder);
 	}
 	
 	public void set_watch_folder(String watch_directory)
 	{
 		watch_folder = new File(watch_directory);
+		check_folder_exists(watch_folder);
 	}
 	
-	public void setup_directories()
+	public File input_folder()
 	{
-		// Gets the directory where your program started 
-		// http://stackoverflow.com/questions/17540942/how-to-get-the-path-of-running-java-program#answer-17541023
-		working_directory = new File(".").getAbsolutePath();
-		working_directory = working_directory.substring(0,working_directory.length()-1);
-		System.out.println("Running from directory: " + working_directory);
-		
-		// Checking if folders exist
-		// Setting directories
-		input_directory = working_directory + input_folder_name;
-		watch_directory = working_directory + watch_folder_name;
-		
-		// Temporary override to Tom's pipeline directory
-		input_directory = "N:\\pipeline\\inputs";
-		watch_directory = "N:\\pipeline\\enhanced";
-		
-		input_folder = new File(input_directory);
-		watch_folder = new File(watch_directory);
-		
-		if(!input_folder.exists()) {input_folder.mkdir();}
-		if(!watch_folder.exists()) {watch_folder.mkdir();}
-		
-		//empty_folder(input_folder);
-		//empty_folder(watch_folder);
+		return input_folder;
+	}
+	
+	public File watch_folder()
+	{
+		return watch_folder;
 	}
 	
 	// Folder Operations
+	public void check_folder_exists(File folder)
+	{
+		if(!folder.exists()) {folder.mkdir();}
+	}
+	
 	public void empty_folder(File folder)
 	{
 		String[] inside_folder = folder.list();
@@ -117,21 +122,9 @@ public class Runner {
 		int watch_interval = 1000;
 		int watch_timeout = 30000;
 		
-		/*
 		public Watch(File file, String callback, Object object)
 		{
-			
-		}
-		*/
-		
-		public Watch(File file, String callback, Object object)
-		{
-			// Override file watching to .png file
-			String original_file = file.getAbsolutePath();
-			String expected_file = original_file.substring(0, original_file.lastIndexOf('.')) + ".png"; 
-			
 			this.file = file;
-			this.file = new File(expected_file);
 			watch_start = p.millis();
 			last_watch = 0;
 			this.object = object;
@@ -147,10 +140,12 @@ public class Runner {
 				{
 					System.out.println("Watcher watching for " + file.getAbsolutePath());
 					
-					if(file.exists() && file_is_fine(file))
+					File watched_file = check_for_file(file);
+					
+					if(watched_file != null && file_is_fine(watched_file))
 					{
 						System.out.println("Watcher found file! " + file.getAbsolutePath());
-						run_callback();
+						run_callback(watched_file);
 						Runner.this.stop_watch();
 					}
 					last_watch = p.millis();
@@ -160,6 +155,38 @@ public class Runner {
 			{
 				System.out.println("Watcher timed out!");
 				Runner.this.stop_watch();
+			}
+		}
+		
+		public File check_for_file(File file)
+		{
+			File checked_file = check_for_file_format(file, ".png");
+			if(checked_file != null) {return checked_file;}
+			
+			checked_file = check_for_file_format(file, ".jpg");
+			if(checked_file != null) {return checked_file;}
+
+			checked_file = check_for_file_format(file, ".gif");
+			if(checked_file != null) {return checked_file;}
+			
+			checked_file = check_for_file_format(file, ".tga");
+			if(checked_file != null) {return checked_file;}
+			
+			return null;
+		}
+		
+		public File check_for_file_format(File file, String format)
+		{
+			String file_path = file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf("."));
+			File check_file = new File(file_path + format);
+			
+			if(check_file.exists())
+			{
+				return check_file;
+			}
+			else
+			{
+				return null;
 			}
 		}
 		
@@ -178,12 +205,12 @@ public class Runner {
 			}
 		}
 		
-		public void run_callback()
+		public void run_callback(File found_file)
 		{
 			try
 			{
 				System.out.println(object);
-				method.invoke(object, file);
+				method.invoke(object, found_file);
 			}
 			catch(Exception e)
 			{
