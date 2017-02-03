@@ -38,6 +38,56 @@ public class Gui {
 		return test_button;
 	}
 	
+	Slider slider()
+	{
+		return null;
+	}
+	
+	public class Slider extends Element
+	{
+		String label = "";
+		
+		int[] base_colour = {0,0,0,0}; // Slider bg colour
+		int[] down_colour = {0,0,0,0}; // When slider is pressed
+		int[] over_colour = {0,0,0,0}; // When slider is hovered
+		int[] current_colour;
+		
+		Slider(PApplet p)
+		{
+			super(0, 0, 0, 0, p);
+		}
+		
+		Slider label(String label)
+		{
+			this.label = label;
+			return this;
+		}
+		
+		Slider x(int x)
+		{
+			this.x = x;
+			return this;
+		}
+		
+		Slider y(int y)
+		{
+			this.y = y;
+			return this;
+		}
+		
+		Slider width(int width)
+		{
+			this.w = width;
+			return this;
+		}
+		
+		Slider height(int height)
+		{
+			this.h = height;
+			return this;
+		}
+	}
+	
 	public class Button extends Element
 	{
 		int[] down_colour = {0,0,0,0}; // When button is activated

@@ -32,7 +32,7 @@ public class Runner {
 	
 	public void setup()
 	{
-		if(false)
+		if(false) // set to false for debugging
 		{
 			//Tom's pipeline directory
 			set_input_folder("N:\\pipeline\\inputs");
