@@ -54,6 +54,8 @@ public class Gui {
 		int[] over_colour = {0,0,0,0}; // When slider is hovered
 		int[] current_colour;
 		
+		int progress = 0;
+		
 		Slider(PApplet p)
 		{
 			super(0, 0, 0, 0, p);
@@ -67,6 +69,12 @@ public class Gui {
 			p.noStroke();
 			p.rectMode(PApplet.CORNER);
 			p.rect(x, y, w, h);
+			
+			//p.fill(255,0,0);
+			//int progress_width = progress;
+			//if(progress > w) {progress_width}
+			//p.rect(x, y, progress, h);
+			
 			p.popStyle();
 		}
 		
