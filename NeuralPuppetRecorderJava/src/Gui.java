@@ -1,6 +1,7 @@
 import processing.core.*;
 import processing.event.*;
 
+import java.io.File;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 
@@ -49,12 +50,23 @@ public class Gui {
 	{
 		String label = "";
 		
-		int[] base_colour = {0,0,0,0}; // Slider bg colour
-		int[] down_colour = {0,0,0,0}; // When slider is pressed
-		int[] over_colour = {0,0,0,0}; // When slider is hovered
-		int[] current_colour;
+		Object on_change_object;
+		Method on_change_function;
 		
-		int progress = 0;
+		int[] slider_down_colour = {0,0,0,0}; // When slider is pressed
+		int[] slider_over_colour = {0,0,0,0}; // When slider is hovered
+		int[] base_down_colour = {0,0,0,0}; // When base is pressed
+		int[] base_over_colour = {0,0,0,0}; // When base is hovered
+		
+		int[] slider_up_colour = {0,0,0,0}; // Slider default colour
+		int[] base_up_colour = {0,0,0,0}; // Base default colour
+		
+		int[] cur_base_colour;
+		int[] cur_slider_colour;
+		
+		boolean dragged_started = false;
+		
+		float value = 0.5f; // Out of 1 
 		
 		Slider(PApplet p)
 		{
@@ -64,18 +76,56 @@ public class Gui {
 		@Override
 		void draw()
 		{
+			clamp_slider_value();
+			
+			if(mouse_state == mouse_over) 
+			{
+				cur_base_colour = base_over_colour;
+				cur_slider_colour = slider_over_colour;
+			}
+			else if(mouse_state == mouse_down)
+			{
+				cur_base_colour = base_down_colour;
+				cur_slider_colour = slider_down_colour;
+			}
+			else
+			{
+				cur_base_colour = base_up_colour;
+				cur_slider_colour = slider_up_colour;
+			}
+			
+			// Slider base
 			p.pushStyle();
-			p.fill(0);
+			p.fill(cur_base_colour[0], cur_base_colour[1], cur_base_colour[2], cur_base_colour[3]);
 			p.noStroke();
 			p.rectMode(PApplet.CORNER);
 			p.rect(x, y, w, h);
 			
-			//p.fill(255,0,0);
-			//int progress_width = progress;
-			//if(progress > w) {progress_width}
-			//p.rect(x, y, progress, h);
+			// Slider bar
+			p.fill(cur_slider_colour[0], cur_slider_colour[1], cur_slider_colour[2], cur_slider_colour[3]);
+			p.rect(x, y, value*w, h);
 			
+			// Text Label
+			p.fill(255, 255, 255);
+			p.textAlign(PApplet.CENTER, PApplet.CENTER);
+			p.text(label, x+(w/2), y+(h/2)); 
 			p.popStyle();
+		}
+		
+		void clamp_slider_value()
+		{
+			if(value > 1) {value = 1;}
+			else if(value < 0) {value = 0;}
+		}
+		
+		float value()
+		{
+			return this.value;
+		}
+		
+		void value(float value)
+		{
+			this.value = value;
 		}
 		
 		// Setting Attributes
@@ -106,6 +156,92 @@ public class Gui {
 		Slider height(int height)
 		{
 			this.h = height;
+			return this;
+		}
+		
+		Slider slider_down_colour(int r, int g, int b, int a)
+		{
+			int[] new_colour = {r,g,b,a};
+			slider_down_colour = new_colour;
+			return this;
+		}
+		
+		Slider slider_up_colour(int r, int g, int b, int a)
+		{
+			int[] new_colour = {r,g,b,a};
+			slider_up_colour = new_colour;
+			return this;
+		}
+		
+		Slider slider_over_colour(int r, int g, int b, int a)
+		{
+			int[] new_colour = {r,g,b,a};
+			slider_over_colour = new_colour;
+			return this;
+		}
+		
+		Slider base_down_colour(int r, int g, int b, int a)
+		{
+			int[] new_colour = {r,g,b,a};
+			base_down_colour = new_colour;
+			return this;
+		}
+		
+		Slider base_up_colour(int r, int g, int b, int a)
+		{
+			int[] new_colour = {r,g,b,a};
+			base_up_colour = new_colour;
+			return this;
+		}
+		
+		Slider base_over_colour(int r, int g, int b, int a)
+		{
+			int[] new_colour = {r,g,b,a};
+			base_over_colour = new_colour;
+			return this;
+		}
+		
+		@Override
+		void pressed(boolean within_bounds, MouseEvent e)
+		{
+			super.pressed(within_bounds, e);
+			
+			if(within_bounds)
+			{
+				dragged_started = true;
+				int new_value = (int)(e.getX()-x);
+				value(new_value/w);
+				clamp_slider_value();
+				
+				run_callback_pass(on_change_function, on_change_object);
+			}
+		}
+		
+		@Override
+		void released(boolean within_bounds, MouseEvent e)
+		{
+			super.pressed(within_bounds, e);
+			dragged_started = false;
+		}
+		
+		@Override
+		void dragged(boolean within_bounds, MouseEvent e)
+		{
+			super.dragged(within_bounds, e);
+			
+			if(dragged_started)
+			{
+				int new_value = (int)(e.getX()-x);
+				value(new_value/w);
+				clamp_slider_value();
+				run_callback_pass(on_change_function, on_change_object);
+			}
+		}
+		
+		Slider on_change_function(String function, Object object)
+		{
+			on_change_object = object;
+			on_change_function = set_callback_pass(on_change_function, object, function);
 			return this;
 		}
 	}
@@ -273,14 +409,14 @@ public class Gui {
 		Button on_down_function(String function, Object object)
 		{
 			on_down_object = object;
-			on_down_function = set_function(on_down_function, object, function);
+			on_down_function = set_callback(on_down_function, object, function);
 			return this;
 		}
 		
 		Button on_up_function(String function, Object object)
 		{
 			on_up_object = object;
-			on_up_function = set_function(on_up_function, object, function);
+			on_up_function = set_callback(on_up_function, object, function);
 			return this;
 		}
 		
@@ -307,17 +443,17 @@ public class Gui {
 					if(button_state == button_down)
 					{
 						button_state = button_up;
-						run_function(on_up_function, on_up_object);
+						run_callback(on_up_function, on_up_object);
 					}
 					else if(button_state == button_up)
 					{
 						button_state = button_down;
-						run_function(on_down_function, on_down_object);
+						run_callback(on_down_function, on_down_object);
 					}
 				}
 				else
 				{
-					run_function(on_down_function, on_down_object);
+					run_callback(on_down_function, on_down_object);
 				}
 			}
 			button_entered_down = false;
@@ -354,7 +490,20 @@ public class Gui {
 			this.p = p;
 		}
 		
-		void run_function(Method method, Object object)
+		// Invokes a method, but also passes the element as an argument
+		void run_callback_pass(Method method, Object object)
+		{
+			try
+			{
+				method.invoke(object, this);
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
+		
+		void run_callback(Method method, Object object)
 		{
 			try
 			{
@@ -366,7 +515,23 @@ public class Gui {
 			}
 		}
 		
-		Method set_function(Method method, Object object, String method_name)
+		Method set_callback_pass(Method method, Object object, String method_name)
+		{
+			try
+			{
+				Class[] args = new Class[1];
+				args[0] = Element.class;
+				method = object.getClass().getDeclaredMethod(method_name, args);
+				return method;
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+				return null;
+			}
+		}
+		
+		Method set_callback(Method method, Object object, String method_name)
 		{
 			try
 			{

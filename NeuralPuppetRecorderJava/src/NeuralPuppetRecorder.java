@@ -145,7 +145,10 @@ public class NeuralPuppetRecorder extends PApplet{
 		play.down_colour(0,0,0,255).up_colour(150,150,150,255).over_colour(50,50,50,255);
 		play.on_down_function("play", animation).on_up_function("stop", animation);
 	
-		//timeline.height(25);
+		timeline.height(25).value(0.25f);
+		timeline.base_down_colour(150,150,150,255).base_up_colour(150,150,150,255).base_over_colour(150,150,150,255);
+		timeline.slider_down_colour(200,0,0,255).slider_up_colour(255,0,0,255).slider_over_colour(235,0,0,255);
+		timeline.on_change_function("timeline_select", this);
 	}
 	
 	public void play_button_play()
@@ -160,6 +163,16 @@ public class NeuralPuppetRecorder extends PApplet{
 		play.up_label("PLAY");
 	}
 	
+	public void timeline_select(Gui.Element a)
+	{
+		Gui.Slider slider = (Gui.Slider)a;
+		animation.pause();
+		if(animation.recorded_data != null && animation.recorded_data.points !=null)
+		{
+			animation.current_frame = (int)((animation.recorded_data.points.size()-1)*slider.value());
+		}
+	}
+	
 	public void update_gui()
 	{
 		int top_division_right = (int)width/4;
@@ -172,21 +185,20 @@ public class NeuralPuppetRecorder extends PApplet{
 		render.x(top_division_right*3).y(0).width(top_division_right);
 		
 		int bottom_division = (int)width/4;
-		play.x(0).y(25+(int)canvas.h).width(bottom_division);
-		timeline.x(width/2+50).y(150).width(250);
+		play.x(0).y((int)canvas.y+(int)canvas.h).width(bottom_division);
+		
+		timeline.x(bottom_division).y((int)canvas.y+(int)canvas.h).width(bottom_division*3);
+		
+		if(animation.recorded_data == null || animation.recorded_data.points == null)
+		{
+			timeline.label("N/A").value(0);
+		}
+		else
+		{
+			timeline.value((animation.current_frame+1) / (float)animation.recorded_data.size());
+			timeline.label(animation.current_frame + "/" + (animation.recorded_data.points.size()-1));
+		}
 		
 		gui.draw();
-		
-		if(animation.recorded_data != null && animation.recorded_data.points != null)
-		{
-			float timeline_width = (width-play.w) * (animation.current_frame+1) / (float)animation.recorded_data.size();
-
-			pushStyle();
-			fill(255,0,0);
-			noStroke();
-			rectMode(CORNER);
-			rect(play.x+play.w, play.y, timeline_width, play.h);
-			popStyle();
-		}
 	}
 }
