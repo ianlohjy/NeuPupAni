@@ -37,7 +37,7 @@ public class Animation {
 	{
 		this.p = p;
 		this.r = r;
-		recorded_data = new AnimData(p);
+		recorded_data = new AnimData(this, p);
 		last_playback_time = p.millis();
 	}
 	
@@ -109,12 +109,33 @@ public class Animation {
 	}
 	
 	// Recording
+	void clear_recording()
+	{
+		if(recorded_data != null)
+		{
+			stop();
+			p.play_button_stop();
+			last_playback_time = 0;
+			recorded_data.clear_points();
+		}
+	}
+	
 	void start_recording(float rx, float ry)
 	{
 		// If this is the first time recording is started
 		if(playback != recording)
 		{
-			recorded_data.clear_points();
+			p.println("Recording started");
+			
+			if(recorded_data.points != null && recorded_data.points !=null)
+			{
+				recorded_data.clear_points(current_frame);
+			}
+			else
+			{
+				recorded_data.clear_points();
+			}
+			
 			playback = recording;
 			last_playback_time = 0;
 			
@@ -257,21 +278,31 @@ public class Animation {
 	
 	public PVector get_current_playback_position()
 	{
-		if(playback == recording || playback == playing)
+		PVector return_point;
+		
+		// If the mouse is inside the canvas
+		if(p.canvas.within_bounds(p.mouseX, p.mouseY))
 		{
-			if(recorded_data.points != null)
+			if(playback == playing)
 			{
-				return recorded_data.get_point(current_frame);
+				return_point = recorded_data.get_point(current_frame);
 			}
 			else
 			{
-				return new PVector(p.mouseX, p.mouseY);
+				return_point =  new PVector(p.mouseX, p.mouseY);
 			}
 		}
 		else
 		{
-			return new PVector(p.mouseX, p.mouseY);
+			return_point =  recorded_data.get_point(current_frame);
 		}
+		
+		if(return_point == null)
+		{
+			return_point =  new PVector(p.mouseX, p.mouseY);
+		}
+		
+		return return_point;
 	}
 	
 	public int[] get_face_grid_shape()

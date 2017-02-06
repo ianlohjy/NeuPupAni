@@ -17,6 +17,7 @@ public class NeuralPuppetRecorder extends PApplet{
 	Gui.Button load_json;
 	Gui.Button load_face;
 	Gui.Button render;
+	Gui.Button erase;
 	// GUI Timeline
 	Gui.Button play;
 	Gui.Slider timeline;
@@ -37,7 +38,7 @@ public class NeuralPuppetRecorder extends PApplet{
 	public void setup()
 	{
 		frameRate(120);
-		//surface.setResizable(true);	
+		surface.setResizable(false);	
 		runner = new Runner(this, animation);
 		animation = new Animation(this, runner);
 		canvas = new Canvas(this, animation);
@@ -115,6 +116,7 @@ public class NeuralPuppetRecorder extends PApplet{
 		gui = new Gui(this);
 		
 		load_grid = gui.button();
+		erase = gui.button();
 		load_json = gui.button();
 		save_json = gui.button();
 		load_face = gui.button();
@@ -125,6 +127,10 @@ public class NeuralPuppetRecorder extends PApplet{
 		load_grid.height(25).label("LOAD GRID");
 		load_grid.down_colour(0,0,0,255).up_colour(150,150,150,255).over_colour(50,50,50,255);
 		load_grid.on_down_function("get_grid", animation);
+		
+		erase.height(25).label("ERASE");
+		erase.down_colour(0,0,0,255).up_colour(150,150,150,255).over_colour(50,50,50,255);
+		erase.on_down_function("clear_recording", animation);
 		
 		load_json.height(25).label("LOAD JSON");
 		load_json.down_colour(0,0,0,255).up_colour(150,150,150,255).over_colour(50,50,50,255);
@@ -175,21 +181,24 @@ public class NeuralPuppetRecorder extends PApplet{
 	
 	public void update_gui()
 	{
-		int top_division_right = (int)width/4;
+		int top_division_right = (width/6) + 1;
 		int top_division_left = (width/6) + 1;
 		
 		load_grid.x(0).y(0).width(top_division_left);
-		load_json.x(top_division_left*1).y(0).width(top_division_left);
-		save_json.x(top_division_left*2).y(0).width(top_division_left);
-		load_face.x(top_division_right*2).y(0).width(top_division_right);
-		render.x(top_division_right*3).y(0).width(top_division_right);
+		erase.x(top_division_left*1).y(0).width(top_division_left);
+		load_json.x(top_division_left*2).y(0).width(top_division_left);
+		save_json.x(top_division_right*3).y(0).width(top_division_right);
+		load_face.x(top_division_right*4).y(0).width(top_division_right);
+		render.x(top_division_right*5).y(0).width(top_division_right);
 		
 		int bottom_division = (int)width/4;
 		play.x(0).y((int)canvas.y+(int)canvas.h).width(bottom_division);
 		
 		timeline.x(bottom_division).y((int)canvas.y+(int)canvas.h).width(bottom_division*3);
 		
-		if(animation.recorded_data == null || animation.recorded_data.points == null)
+		if(animation.recorded_data == null 
+		   || animation.recorded_data.points == null 
+		   || animation.recorded_data.points.size() <=0)
 		{
 			timeline.label("N/A").value(0);
 		}

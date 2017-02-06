@@ -8,11 +8,13 @@ import processing.core.*;
 public class AnimData{
 
 	PApplet p;
+	Animation a;
 	
 	ArrayList<PVector> points;	
 	
-	AnimData(PApplet p)
+	AnimData(Animation a, PApplet p)
 	{
+		this.a = a;
 		this.p = p;
 	}
 	
@@ -30,14 +32,17 @@ public class AnimData{
 			{
 				// Determining stroke highlight
 				stroke_colour = new int[] {255,255,255};
-				if(highlight_to_point >= 0 && highlight_to_point >= d){stroke_colour = new int[] {255,0,0};}
+				if(highlight_to_point >= 0 && highlight_to_point > d){stroke_colour = new int[] {255,0,0};}
 
 				p.strokeWeight(5);
 				
 				if(d == points.size()-1)
 				{
-					p.stroke(stroke_colour[0], stroke_colour[1], stroke_colour[2], 50);
-					p.line(points.get(d).x, points.get(d).y, points.get(0).x, points.get(0).y);
+					if(a.playback != a.recording)
+					{
+						p.stroke(stroke_colour[0], stroke_colour[1], stroke_colour[2], 50);
+						p.line(points.get(d).x, points.get(d).y, points.get(0).x, points.get(0).y);
+					}
 				}
 				else
 				{
@@ -61,17 +66,46 @@ public class AnimData{
 		{
 			if(points.size() > 3)
 			{
+				// Draw a dotted of the bezier curve that joins the ends together
 				p.pushStyle();
 				p.noFill();
-				p.stroke(255,0,0);
-				p.strokeWeight(1);
+				p.stroke(255);
+				p.strokeWeight(5);
 				
 				PVector[] bezier_join = join_ends_with_bezier();
 				
+				int div_size = 10;
+				int num_divisions = (int)(p.dist(points.get(0).x, 
+												 points.get(0).y, 
+												 points.get(points.size()-1).x,
+												 points.get(points.size()-1).y)
+												 /div_size);
+				
+				float first_x = p.bezierPoint(bezier_join[0].x, bezier_join[1].x,
+										      bezier_join[2].x, bezier_join[3].x, 0);
+				float first_y = p.bezierPoint(bezier_join[0].y, bezier_join[1].y,
+					     					  bezier_join[2].y, bezier_join[3].y, 0);
+				
+				for(int d=0; d<num_divisions; d++)
+				{
+					float last_x = p.bezierPoint(bezier_join[0].x, bezier_join[1].x,
+								            	 bezier_join[2].x, bezier_join[3].x, (float)d/num_divisions);
+					float last_y = p.bezierPoint(bezier_join[0].y, bezier_join[1].y,
+		 	                 					 bezier_join[2].y, bezier_join[3].y, (float)d/num_divisions);
+					if(d%2 == 0)
+					{
+							p.line(first_x, first_y, last_x, last_y);
+					}
+					first_x = last_x;
+					first_y = last_y;
+				}
+				
+				/*
 				p.bezier(bezier_join[0].x, bezier_join[0].y, 
 						 bezier_join[1].x, bezier_join[1].y, 
 						 bezier_join[2].x, bezier_join[2].y, 
 						 bezier_join[3].x, bezier_join[3].y);
+				*/
 				
 			    p.popStyle();
 			}
@@ -81,24 +115,48 @@ public class AnimData{
 	// Point Operations
 	PVector get_point(int index)
 	{
-		if(points == null)
+		try
+		{
+			if(points == null)
+			{
+				return null;
+			}
+			else
+			{
+				return points.get(index);
+			}
+		}
+		catch(Exception e)
 		{
 			return null;
-		}
-		else
-		{
-			return points.get(index);
 		}
 	}
 	  
 	void add_point(float x, float y)
 	{
-		points.add(new PVector(x, y));  
+		try
+		{
+			points.add(new PVector(x, y));  
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			p.println("Could not add point to anim data");
+		}
 	}
 	  
 	void clear_points()
 	{
 		points = new ArrayList<PVector>();
+	}
+	
+	void clear_points(int index)
+	{
+		// Clears all data points after an index
+		if(index <= points.size()-1)
+		{
+			points = new ArrayList<>(points.subList(0, index+1));
+		}
 	}
 	
 	int size()

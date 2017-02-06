@@ -49,7 +49,7 @@ public class Canvas extends Gui.Element{
 		// Current Frame
 		PVector current_frame_point = a.recorded_data.get_point(a.current_frame);
 		if(current_frame_point != null)
-		{
+		{	
 			p.pushStyle();
 			p.fill(255,0,0);
 			p.noStroke();
