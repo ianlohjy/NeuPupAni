@@ -25,11 +25,14 @@ public class Runner {
 	
 	public void setup()
 	{
-		if(false) // set to false for debugging
+		if(true) // set to false for debugging
 		{
 			//Tom's pipeline directory
 			set_input_folder("N:\\pipeline\\inputs");
 			set_watch_folder("N:\\pipeline\\enhanced");
+			// MacOS Desktop
+			//set_input_folder(System.getProperty("user.home") + "/Desktop/_input");
+			//set_input_folder(System.getProperty("user.home") + "/Desktop/_watch"); 
 		}
 		else
 		{

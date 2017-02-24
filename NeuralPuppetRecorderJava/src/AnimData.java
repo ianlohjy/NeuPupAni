@@ -69,7 +69,7 @@ public class AnimData{
 				// Draw a dotted of the bezier curve that joins the ends together
 				p.pushStyle();
 				p.noFill();
-				p.stroke(255);
+				p.stroke(255,100);
 				p.strokeWeight(5);
 				
 				PVector[] bezier_join = join_ends_with_bezier();
