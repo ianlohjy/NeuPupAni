@@ -47,6 +47,8 @@ public class Display extends Gui.Element{
 			float grid_x = Utilities.crop(current_playback_position.x, 0, w);
 			float grid_y = Utilities.crop(current_playback_position.y, 0, h);
 			
+			int padding = 70;
+			
 			grid_x = grid_x/w * face_grid_shape[0];
 			grid_y = grid_y/h * face_grid_shape[1];
 			
@@ -60,7 +62,12 @@ public class Display extends Gui.Element{
 			float div_w = display_image.width/face_grid_shape[0]; 
 			float div_h = display_image.height/face_grid_shape[1]; 
 			
-			p.copy(display_image, (int)(grid_x*div_w), (int)(grid_y*div_h), (int)div_w, (int)div_h, (int)x, (int)y, w, h);
+			p.copy(display_image, 
+				   (int)((grid_x*div_w)+padding),
+				   (int)((grid_y*div_h)+padding*1.5), 
+				   (int)div_w-(padding*2), 
+				   (int)div_h-(padding*2),
+				   (int)x,(int)y, w, h);
 		}
 	}
 	

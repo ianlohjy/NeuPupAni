@@ -29,7 +29,7 @@ public class Runner {
 		{
 			//Tom's pipeline directory
 			set_input_folder("N:\\pipeline\\inputs");
-			set_watch_folder("N:\\pipeline\\enhanced");
+			set_watch_folder("N:\\pipeline\\enhanced3");
 			// MacOS Desktop
 			//set_input_folder(System.getProperty("user.home") + "/Desktop/_input");
 			//set_input_folder(System.getProperty("user.home") + "/Desktop/_watch"); 
