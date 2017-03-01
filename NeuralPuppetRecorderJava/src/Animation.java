@@ -4,6 +4,7 @@ import java.net.NetworkInterface;
 import java.nio.file.Files;
 
 import processing.core.PApplet;
+import processing.core.PGraphics;
 import processing.core.PImage;
 import processing.core.PVector;
 
@@ -177,6 +178,11 @@ public class Animation {
 		p.selectInput("Load a json file", "load", null, this);
 	}
 	
+	public void select_render_path()
+	{
+		p.selectOutput("Choose a filename for renders", "render", null, this);
+	}
+	
 	public void save(File save_path)
 	{
 		if(save_path != null)
@@ -190,6 +196,60 @@ public class Animation {
 		if(load_path != null)
 		{
 			recorded_data.load_json(load_path);
+		}
+	}
+	
+	public void render(File render_path)
+	{
+		if(recorded_data != null && recorded_data.points != null)
+		{
+			int target_frames = 10;
+			
+			p.println("==STARTING RENDER("+ target_frames +"==");
+			
+			stop();
+			for(int f=0; f<target_frames; f++)
+			{
+				current_frame = (int)((float)recorded_data.size()*((float)f/target_frames));
+				this.update();
+				
+				// Really BAD fix. PGraphics for some reason do not fully render, leaving bits unrendered.
+				// Solution: Rerender each frame multiple times without refreshing the background. 
+				// This should hopefully render enough times to cover over any missing parts
+				
+				// Normally, I would just try to call PApplet's draw() function and save the frames after. 
+				// But I get a fatal error when I try (looks like a graphics card driver issue for me)
+				// So this is a adhoc solution.
+				
+				p.display.show_animation_result();
+				p.display.show_animation_result();
+				p.display.show_animation_result();
+				p.display.show_animation_result();
+				p.display.show_animation_result();
+				
+				p.println("Rendering frame "+ current_frame + "...");
+				
+				/*
+				// Saved images are sometime corrupted. This is a simple check to detect them.
+				boolean render_ok = false;
+				int times_checked = 0;
+				int timeout = 5;
+				
+				while(!render_ok)
+				{
+					p.display.preview_frame.get(0,0);
+					
+					times_checked++;
+					if(times_checked > timeout)
+					{
+						break;
+					}
+				}*/
+				
+				p.display.preview_frame.save(render_path.getAbsolutePath() + "_" + current_frame + ".png");
+			}
+			
+			p.println("==FLIPPING DONE==");
 		}
 	}
 	

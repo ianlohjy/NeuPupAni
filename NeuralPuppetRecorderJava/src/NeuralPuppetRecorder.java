@@ -146,6 +146,7 @@ public class NeuralPuppetRecorder extends PApplet{
 		
 		render.height(25).label("RENDER");
 		render.down_colour(0,0,0,255).up_colour(150,150,150,255).over_colour(50,50,50,255);
+		render.on_down_function("select_render_path", animation);
 		
 		play.height(25).label("PLAY").set_toggle();
 		play.down_colour(0,0,0,255).up_colour(150,150,150,255).over_colour(50,50,50,255);
