@@ -108,6 +108,15 @@ public class NeuralPuppetRecorder extends PApplet{
 				show_framerate = true;
 			}
 		}
+		
+		if(e.getKeyCode() == 38) // UP key
+		{
+			display.zoom_in();
+		}
+		if(e.getKeyCode() == 40) // DOWN key
+		{
+			display.zoom_out();
+		}
 	}
 	
 	// GUI

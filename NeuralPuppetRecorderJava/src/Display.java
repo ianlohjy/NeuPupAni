@@ -8,6 +8,10 @@ public class Display extends Gui.Element{
 	Animation a;
 	int w, h;
 	PGraphics preview_frame;
+
+	float zoom_factor = 0;
+	float zoom_step = 0.0025f;
+	float zoom_max = 0.05f;
 	
 	Display(PApplet p, Animation a)
 	{
@@ -64,7 +68,7 @@ public class Display extends Gui.Element{
 			float grid_x = Utilities.crop(current_playback_position.x, 0, w);
 			float grid_y = Utilities.crop(current_playback_position.y, 0, h);
 			
-			int padding = 25;
+			int padding = (int)(display_image.width*zoom_factor);
 			
 			grid_x = grid_x/w * face_grid_shape[0];
 			grid_y = grid_y/h * face_grid_shape[1];
@@ -81,15 +85,35 @@ public class Display extends Gui.Element{
 			
 			preview_frame.copy(display_image, 
 				   (int)((grid_x*div_w)+padding),
-				   (int)((grid_y*div_h)+padding*1.5), 
+				   (int)((grid_y*div_h)+padding*1.4), 
 				   (int)div_w-(padding*2), 
 				   (int)div_h-(padding*2),
 				   (int)0,(int)0, w, h);
 		}
-		
 		preview_frame.endDraw();
 		p.image(preview_frame, x, y);
 	}
 	
+	void zoom_in()
+	{
+		zoom_factor += zoom_step;
+		
+		if(zoom_factor > zoom_max)
+		{
+			zoom_factor = zoom_max;
+		}
+		p.println(zoom_factor);
+	}
+	
+	void zoom_out()
+	{
+		zoom_factor -= zoom_step;
+		
+		if(zoom_factor < 0)
+		{
+			zoom_factor = 0;
+		}
+		p.println(zoom_factor);
+	}
 	
 }
