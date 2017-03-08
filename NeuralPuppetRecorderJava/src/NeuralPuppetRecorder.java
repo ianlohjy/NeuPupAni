@@ -32,6 +32,7 @@ public class NeuralPuppetRecorder extends PApplet{
 	// Processing methods
 	public void settings()
 	{
+		//size(1280, 690, P3D);
 		size(1000, 550, P3D);
 	}
 	

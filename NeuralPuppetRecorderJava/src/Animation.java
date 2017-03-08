@@ -203,7 +203,7 @@ public class Animation {
 	{
 		if(recorded_data != null && recorded_data.points != null)
 		{
-			int target_frames = 10;
+			int target_frames = recorded_data.size();
 			
 			p.println("==STARTING RENDER("+ target_frames +"==");
 			
@@ -248,7 +248,6 @@ public class Animation {
 				
 				p.display.preview_frame.save(render_path.getAbsolutePath() + "_" + current_frame + ".png");
 			}
-			
 			p.println("==FLIPPING DONE==");
 		}
 	}
@@ -266,6 +265,10 @@ public class Animation {
 	
 	public void face_selected(File selection)
 	{
+		// Fake image processing for demo purposes
+		//grid_done_processing(new File("C:\\Users\\Ian\\Desktop\\NPR Demo\\OpenSmile1.png")); 
+		//return;
+		
 		//String file_path = selection.getAbsolutePath();
 		String file_format = selection.toString().substring(selection.toString().lastIndexOf('.'), selection.toString().length()).toLowerCase();
 		//String file_wo_format = file_path.substring(0, file_path.lastIndexOf('.'));

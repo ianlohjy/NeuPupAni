@@ -173,8 +173,8 @@ public class AnimData{
 	    for(int p=0; p< points.size(); p++)
 	    {
 	      JSONArray  json_point = new JSONArray();
-	      float norm_x = PApplet.map(points.get(p).x, 0, 500, 0, 1);
-	      float norm_y = PApplet.map(points.get(p).y, 25, 525, 0, 1);
+	      float norm_x = PApplet.map(points.get(p).x, a.p.canvas.x, a.p.canvas.x+a.p.canvas.w, 0, 1);
+	      float norm_y = PApplet.map(points.get(p).y, a.p.canvas.y, a.p.canvas.y+a.p.canvas.h, 0, 1);
 	      
 	      json_point.setFloat(0, norm_x);
 	      json_point.setFloat(1, norm_y);
@@ -196,8 +196,8 @@ public class AnimData{
 	    for(int p=0; p<data_points.size(); p++)
 	    {
 	       JSONArray point = data_points.getJSONArray(p);
-	       float mapped_x = PApplet.map(point.getFloat(0), 0, 1, 0, 500);
-	       float mapped_y = PApplet.map(point.getFloat(1), 0, 1, 25, 525);
+	       float mapped_x = PApplet.map(point.getFloat(0), 0, 1, a.p.canvas.x, a.p.canvas.x+a.p.canvas.w);
+	       float mapped_y = PApplet.map(point.getFloat(1), 0, 1, a.p.canvas.y, a.p.canvas.y+a.p.canvas.h);
 	       this.add_point(mapped_x, mapped_y);
 	    }
 	}
