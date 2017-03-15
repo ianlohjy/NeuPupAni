@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script type="text/javascript" src="./js/whammy/whammy.js"></script>
+    
+        <script type='text/javascript'>
+
+            var image;
+            image = new Image();
+            image.src = './imgs/open_smile.png';
+
+            function init()
+            {   
+                var canvas = document.getElementById('canvas');
+                var context = canvas.getContext('2d');
+                canvas.width = 512; // Certain resolutions will display the colours of drawn items incorectly
+                canvas.height = 512;
+
+                context.fillStyle = 'rgb(100,200,255)';
+                context.fillRect(0,0,canvas.width, canvas.height); //GIF can't do transparent so do white
+
+                context.drawImage(image, 0, 0, 512, 512); // It seems that the encoder does not work with images
+
+                context.fillStyle = "rgb(200,50,0)";  
+                context.fillRect (10, 10, 75, 50);   //draw a little red box
+
+                var encoder = new Whammy.Video(15);
+
+                function callback(output)
+                {   //var url = window.URL.createObjectURL(output);  
+                    var url = (window.webkitURL || window.URL).createObjectURL(output);
+                    console.log(output); 
+                    console.log(url); 
+                    console.log('done?');         
+                }
+
+                encoder.add(context);
+                encoder.compile(false, callback); // Output as Blob
+
+                
+
+            }   
+        </script>
+        
+        <style type='text/css'>
+        </style>
+
+    </head>
+    
+    <body onload='init()'>
+        <canvas id='canvas'></canvas>
+    </body>
+
+</html>
