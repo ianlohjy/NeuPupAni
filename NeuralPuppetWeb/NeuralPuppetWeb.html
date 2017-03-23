@@ -11,8 +11,10 @@
         <script type="text/javascript" src="./js/jsgif/GIFEncoder.js"></script>
         <script type="text/javascript" src="./js/jsgif/b64.js"></script>
 
-        <script type='text/javascript' src='./js/graphics.js'></script>
+        <script type='text/javascript' src='./js/canvasy/canvasy.js'></script>
         <script type='text/javascript' src='./js/animation.js'></script>
+        <script type='text/javascript' src='./js/grid.js'></script>
+        <script type='text/javascript' src='./js/display.js'></script>
         <script type='text/javascript'>
 
         // Windows
@@ -20,127 +22,85 @@
         var display;
         
         // Animation
-        var anim;
+        var animation;
 
-        // Data
-        var face_grid; // Face Grid
-        
         // Utilities
         var cur_timestamp; // For calculating fps
         var fps;
 
         function init()
-        {
-            grid = new Canvas('anim-grid');
-            grid.setup_mouse_events();
-            grid.mouse_down = grid_mouse_down;
-            grid.mouse_up = grid_mouse_up;
+        {   animation = new Animation();
+            animation.data.set_grid_image('./imgs/open_smile.png', 7, 7);
 
-            display = new Canvas('anim-display');
+
+            grid = new Grid();
+            display = new Display();
             
-            face_grid = new Image();
-            face_grid.src = './imgs/open_smile.png';
+            //face_grid = new Image();
+            //face_grid.src = './imgs/open_smile.png';
 
-            cur_timestamp = performance.now();
-            anim = new Animation();
-
+            cur_timestamp = time();
+            
             register_events(); // Window level events
             resize_windows();
 
             start_loop(loop);
         }
 
-        function start_render()
-        {   anim.render_start();
-        }
-
-        function grid_mouse_down(e)
-        {   anim.start_recording(grid.mouse_x/grid.width, grid.mouse_y/grid.height);
-        }
-
-        function grid_mouse_up(e)
-        {
-            anim.stop_recording();
-        }
-
-        function display_recording()
-        {   // Draws path in Animation.data
-            if(anim.data.size > 0)
-            {   let path = anim.data.path;   
-                
-                grid.context.beginPath();
-                grid.context.strokeStyle = 'red';
-                grid.context.lineJoin = 'round';
-                grid.context.lineWidth = 2;
-
-                grid.context.moveTo(path[0].x*grid.width, path[0].y*grid.height);
-                //console.log(path[0].x*grid.width);
-
-                for(var p=0; p<path.length; p++)
-                {
-                    grid.context.lineTo(path[p].x*grid.width, path[p].y*grid.height);
-                } 
-                grid.context.stroke(); 
-                grid.context.closePath();
-            }
-        }
-
         function loop()
         {
-            grid.context.clearRect(0, 0, grid.width, grid.height);
-            display.context.clearRect(0, 0, display.width, display.height);
-            
-            grid.context.globalAlpha = 0.25;
-            grid.context.drawImage(face_grid, 0, 0, grid.width, grid.height); 
-            grid.context.globalAlpha = 1;
-            show_grid_position();
+            animation.update_cursor(grid.canvas.mouse_x/ grid.canvas.width,
+                                    grid.canvas.mouse_y/ grid.canvas.height);
+            animation.update();
 
-            display_recording();
-            anim.update(grid.mouse_x/grid.width, grid.mouse_y/grid.height);
-
-            display_face(grid.mouse_x/grid.width, grid.mouse_y/grid.height);
+            grid.update();
+            display.update();
 
             calculate_fps();
             get_id('fps').innerText = fps + ' FPS'
         }
 
-        function display_face(amt_x, amt_y)
-        {   // Displays part of the face_grid based on x / y position (0 to 1.0)
-            // Find the division & size of a grid square
-            let grid_shape = [7, 7];
-            let div_x = face_grid.width / grid_shape[0];
-            let div_y = face_grid.height/ grid_shape[1];
-            // Find out which grid square to display
-            let loc_x = Math.floor(amt_x * grid_shape[0]);
-            let loc_y = Math.floor(amt_y * grid_shape[1]);
-            // Make sure that grid square is between 0 and grid_size[n]-1
-            if(loc_x < 0){loc_x = 0};
-            if(loc_x > grid_shape[0]-1){loc_x = grid_shape[0]-1};
-            if(loc_y < 0){loc_y = 0};
-            if(loc_y > grid_shape[1]-1){loc_y = grid_shape[1]-1};
-            // Show the right part of the face_grid
-            display.context.drawImage(face_grid, 
-                                      loc_x*div_x, loc_y*div_y, div_x, div_y, 
-                                      0, 0, display.width, display.height);
+        /*
+        function start_render()
+        {   anim.render_start();
+        }*/
+
+        // UI
+        function resize_windows()
+        {   // Positions and resizes windows. 
+            // parseFloat() is used to get values or
+            // they will return with 'px' at the end 
+            let window_width = window.innerWidth/2;
+
+            // Limit max size
+            if(window_width > 500) window_width = 500;
+           
+            grid.canvas.id.style.top = '0px';
+            grid.canvas.id.style.left = '0px';
+            grid.canvas.width = window_width;
+            grid.canvas.height = parseFloat(grid.canvas.width);
+
+            display.canvas.id.style.top = parseFloat(grid.canvas.id.style.top) + 'px';
+            display.canvas.id.style.left = parseFloat(grid.canvas.id.style.left) + parseFloat(grid.canvas.width) + 'px';
+            display.canvas.width = window_width;
+            display.canvas.height = parseFloat(grid.canvas.height);
         }
 
-        function show_grid_position()
-        {   
-            let x = (grid.mouse_x/grid.width).toFixed(1);
-            let y = (grid.mouse_y/grid.height).toFixed(1);
-            
-            grid.context.font = '12px Arial';
-            grid.context.textAlign = 'center';
-            
-            let text = x + ' / ' + y;
-            let text_size = grid.context.measureText(text);
-            
-            // Draw Label
-            grid.context.fillStyle = 'black';
-            grid.context.fillRect(grid.mouse_x-2.5-text_size.width/2, grid.mouse_y-27, text_size.width+5, 17);
-            // Draw Text
-            grid.context.fillStyle = 'white';
-            grid.context.fillText(text, grid.mouse_x, grid.mouse_y-15);
+        // EVENTS
+        function on_resize()
+        {   // Called with window is resized
+            resize_windows();
+        }
+
+        function register_events()
+        {   // Register any document / window level events here
+            window.onresize = on_resize;
+        }
+
+        // UTILITY
+        function get_id(id)
+        {   // Shortify wrapper to get elements
+            return document.getElementById(id);
         }
 
         function start_loop(func)
@@ -155,46 +115,16 @@
             return animation_request; 
         }
 
-        // UI
-        function resize_windows()
-        {   // Positions and resizes windows. 
-            // parseFloat() is used to get values or
-            // they will return with 'px' at the end 
-            let window_width = window.innerWidth/2;
-            // Limit max size
-            if(window_width > 500) window_width = 700;
-           
-            grid.id.style.top = '0px';
-            grid.id.style.left = '0px';
-            grid.width = window_width;
-            grid.height = parseFloat(grid.width);
-
-            display.id.style.top = parseFloat(grid.id.style.top) + 'px';
-            display.id.style.left = parseFloat(grid.id.style.left) + parseFloat(grid.width) + 'px';
-            display.width = window_width;
-            display.height = parseFloat(grid.height);
-        }
-
-        function on_resize()
-        {   // Called with window is resized
-            resize_windows();
-        }
-
-        function register_events()
-        {   // Register any document / window level events here
-            window.onresize = on_resize;
-        }
-
-        function get_id(id)
-        {   // Shortify wrapper to get elements
-            return document.getElementById(id);
-        }
-
         function calculate_fps()
         {   // Calculates FPS
-            let time_diff = performance.now() - cur_timestamp;
-            cur_timestamp = performance.now();
+            let time_diff = time() - cur_timestamp;
+            cur_timestamp = time();
             fps = (1000/time_diff).toFixed(1);
+        }
+
+        function time()
+        {   // Wrapper for performance.now()
+            return performance.now();
         }
 
         </script>

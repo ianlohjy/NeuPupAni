@@ -20,14 +20,23 @@ function Animation()
     this.render_length = 5000; // In milliseconds
     this.render_start_time = 0;
     this.rendering = false;
+    // Cursor
+    this.cursor_x = 0;
+    this.cursor_y = 0;
 
-    Animation.prototype.update = function(x, y)
+
+    Animation.prototype.update = function()
     {   if(this.mode == RECORD)
-        {   this.record(x,y);
+        {   this.record(this.cursor_x, this.cursor_y);
         }
         if(this.rendering)
         {   this.render();
         }
+    }
+
+    Animation.prototype.update_cursor = function(cursor_x, cursor_y)
+    {   this.cursor_x = cursor_x;
+        this.cursor_y = cursor_y;
     }
 
     Animation.prototype.render_start = function()
@@ -71,6 +80,7 @@ function Animation()
         //console.log(data_url);
     }
 
+    // Recording
     Animation.prototype.record = function(x, y)
     {   if(performance.now() - this.last_playback_time >= this.millis_per_frame)
         {   this.data.add_point(x,y);
@@ -92,6 +102,9 @@ function Animation()
 function AnimData()
 {   // Handles all animation data
     this.path = new Array();
+    // Image Data
+    this.image = null;
+    this.image_shape = [1, 1];
 
     // Data Properties
     Object.defineProperty(this, 'size',
@@ -106,6 +119,13 @@ function AnimData()
     AnimData.prototype.clear = function()
     {   // Resets this.path
         this.path = new Array();
+    }
+
+    AnimData.prototype.set_grid_image = function(src, rows, cols)
+    {   // Sets up image
+        this.image = new Image();
+        this.image.src = src;
+        this.image_shape = [rows, cols]; 
     }
 
     // Point Class

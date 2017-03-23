@@ -1,5 +1,5 @@
-function Canvas (element_id) 
-{   // Wrapper for canvas context with some handy methods
+function Canvasy (element_id) 
+{   // Wrapper for Canvas context with some handy methods
     // Element Data
     this.id_tag  = element_id;
     this.id      = null;
@@ -28,20 +28,20 @@ function Canvas (element_id)
     });
     
     // Prototype Methods
-    Canvas.prototype.init = function()
+    Canvasy.prototype.init = function()
     {   // This method is run when the object is created.
         this.id = document.getElementById(this.id_tag); 
         this.setup_context();
         //this.setup_mouse_events(); // Don't run this by default, since it may be expensive
     }
 
-    Canvas.prototype.setup_context = function()
+    Canvasy.prototype.setup_context = function()
     {   // Gets and returns the 2d context if available
         this.context = this.id.getContext('2d');
         return this.context;
     }
 
-    Canvas.prototype.setup_mouse_events = function()
+    Canvasy.prototype.setup_mouse_events = function()
     {   // Register and set mouse events to log_mouse method
         this.id.onmouseup    = this.log_mouse;
         this.id.onmousedown  = this.log_mouse;  
@@ -53,7 +53,7 @@ function Canvas (element_id)
         this.id.onmouseover  = this.log_mouse;
     }
 
-    Canvas.prototype.log_mouse = function(event)
+    Canvasy.prototype.log_mouse = function(event)
     {   /* In this scope, 'this' refers to the HTML element 
            returned by the mouse event NOT the parent class.
            This means we cannot use 'this' to access the class.
@@ -100,6 +100,10 @@ function Canvas (element_id)
                 _canvas.mouse_over(event);
                 break;
         }
+    }
+
+    Canvasy.prototype.todo = function()
+    {   console.log('Fold Canvasy methods and properties into the Canvas prototype (?)');
     }
 
     // The prototypes are being set in a function so the class
