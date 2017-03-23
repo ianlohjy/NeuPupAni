@@ -12,6 +12,7 @@ function Animation()
     // States
     this.mode = PAUSE;
     this.last_playback_time = performance.now();
+    /*
     // GIF Recording & render settings
     this.gif_encoder = new GIFEncoder();
     this.last_rendered_frame = performance.now();
@@ -20,10 +21,10 @@ function Animation()
     this.render_length = 5000; // In milliseconds
     this.render_start_time = 0;
     this.rendering = false;
+    */
     // Cursor
     this.cursor_x = 0;
     this.cursor_y = 0;
-
 
     Animation.prototype.update = function()
     {   if(this.mode == RECORD)

@@ -15,29 +15,29 @@
         <script type='text/javascript' src='./js/animation.js'></script>
         <script type='text/javascript' src='./js/grid.js'></script>
         <script type='text/javascript' src='./js/display.js'></script>
+        <script type='text/javascript' src='./js/renderer.js'></script>
         <script type='text/javascript'>
 
         // Windows
         var grid;
         var display;
-        
+        var test;
         // Animation
         var animation;
+        var renderer;
 
         // Utilities
         var cur_timestamp; // For calculating fps
         var fps;
 
         function init()
-        {   animation = new Animation();
+        {
+            animation = new Animation();
             animation.data.set_grid_image('./imgs/open_smile.png', 7, 7);
-
 
             grid = new Grid();
             display = new Display();
-            
-            //face_grid = new Image();
-            //face_grid.src = './imgs/open_smile.png';
+            renderer = new Renderer();
 
             cur_timestamp = time();
             
@@ -60,10 +60,13 @@
             get_id('fps').innerText = fps + ' FPS'
         }
 
-        /*
+        
         function start_render()
-        {   anim.render_start();
-        }*/
+        {   renderer.setup_render(animation.data, 5);
+            renderer.start_render();
+            renderer.while_render();
+            renderer.finish_render();
+        }
 
         // UI
         function resize_windows()
@@ -75,13 +78,13 @@
             // Limit max size
             if(window_width > 500) window_width = 500;
            
-            grid.canvas.id.style.top = '0px';
-            grid.canvas.id.style.left = '0px';
+            grid.canvas.element.style.top = '0px';
+            grid.canvas.element.style.left = '0px';
             grid.canvas.width = window_width;
             grid.canvas.height = parseFloat(grid.canvas.width);
 
-            display.canvas.id.style.top = parseFloat(grid.canvas.id.style.top) + 'px';
-            display.canvas.id.style.left = parseFloat(grid.canvas.id.style.left) + parseFloat(grid.canvas.width) + 'px';
+            display.canvas.element.style.top = parseFloat(grid.canvas.element.style.top) + 'px';
+            display.canvas.element.style.left = parseFloat(grid.canvas.element.style.left) + parseFloat(grid.canvas.width) + 'px';
             display.canvas.width = window_width;
             display.canvas.height = parseFloat(grid.canvas.height);
         }

@@ -9,17 +9,17 @@ function Display()
 
     Display.prototype.update = function()
     {
-        this.display_face();
+        this.display_face(animation.cursor_x, animation.cursor_y);
     }
 
-    Display.prototype.display_face = function()
-    {   // Displays part of the Animation.data.image based on Animation's cursor position (0 to 1.0)
+    Display.prototype.display_face = function(amt_x, amt_y)
+    {   // Displays part of the Animation.data.image based on amt_x & amt_y (0 to 1.0)
         // Find the size of a each grid square
         let div_x = animation.data.image.width / animation.data.image_shape[0];
         let div_y = animation.data.image.height/ animation.data.image_shape[1];
         // Find out which grid square to display
-        let loc_x = Math.floor(animation.cursor_x * animation.data.image_shape[0]);
-        let loc_y = Math.floor(animation.cursor_y * animation.data.image_shape[1]);
+        let loc_x = Math.floor(amt_x * animation.data.image_shape[0]);
+        let loc_y = Math.floor(amt_y * animation.data.image_shape[1]);
         // Make sure that grid square is between 0 and grid_shape-1
         if(loc_x < 0){loc_x = 0};
         if(loc_x > animation.data.image_shape[0]-1){loc_x = animation.data.image_shape[0]-1};

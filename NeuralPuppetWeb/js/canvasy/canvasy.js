@@ -1,8 +1,8 @@
 function Canvasy (element_id) 
 {   // Wrapper for Canvas context with some handy methods
     // Element Data
-    this.id_tag  = element_id;
-    this.id      = null;
+    this.id      = element_id;
+    this.element = null;
     this.context = null;
 
     // Keep a reference to the parent class
@@ -18,39 +18,46 @@ function Canvasy (element_id)
     
     // Canvas Data
     Object.defineProperty(this, 'width',
-    {   get: function(){return this.id.width;},
-        set: function(value){this.id.width = value;}
+    {   get: function(){return this.element.width;},
+        set: function(value){this.element.width = value;}
     });
 
     Object.defineProperty(this, 'height',
-    {   get: function(){return this.id.height;},
-        set: function(value){this.id.height = value;}
+    {   get: function(){return this.element.height;},
+        set: function(value){this.element.height = value;}
     });
     
     // Prototype Methods
     Canvasy.prototype.init = function()
     {   // This method is run when the object is created.
-        this.id = document.getElementById(this.id_tag); 
+        if(this.id === undefined)
+        {   // If no id was given create a new canvas element in the document
+            this.element = document.createElement('canvas');
+        }
+        else
+        {   this.element = document.getElementById(this.id); 
+        }
+        
         this.setup_context();
         //this.setup_mouse_events(); // Don't run this by default, since it may be expensive
     }
 
     Canvasy.prototype.setup_context = function()
     {   // Gets and returns the 2d context if available
-        this.context = this.id.getContext('2d');
+        this.context = this.element.getContext('2d');
         return this.context;
     }
 
     Canvasy.prototype.setup_mouse_events = function()
     {   // Register and set mouse events to log_mouse method
-        this.id.onmouseup    = this.log_mouse;
-        this.id.onmousedown  = this.log_mouse;  
-        this.id.onmousewheel = this.log_mouse;
-        this.id.onmouseenter = this.log_mouse;
-        this.id.onmouseleave = this.log_mouse;
-        this.id.onmouseout   = this.log_mouse;
-        this.id.onmousemove  = this.log_mouse;
-        this.id.onmouseover  = this.log_mouse;
+        this.element.onmouseup    = this.log_mouse;
+        this.element.onmousedown  = this.log_mouse;  
+        this.element.onmousewheel = this.log_mouse;
+        this.element.onmouseenter = this.log_mouse;
+        this.element.onmouseleave = this.log_mouse;
+        this.element.onmouseout   = this.log_mouse;
+        this.element.onmousemove  = this.log_mouse;
+        this.element.onmouseover  = this.log_mouse;
     }
 
     Canvasy.prototype.log_mouse = function(event)
@@ -60,7 +67,7 @@ function Canvasy (element_id)
            Setting var _canvas = this; in the constructor 
            works around this by exposing the parent class.
         */ 
-        let element_rect = _canvas.id.getBoundingClientRect();
+        let element_rect = _canvas.element.getBoundingClientRect();
         let x_offset = element_rect.left + window.pageXOffset;
         let y_offset = element_rect.top  + window.pageYOffset;
         
