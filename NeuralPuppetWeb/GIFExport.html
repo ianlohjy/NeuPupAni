@@ -16,13 +16,13 @@
             {   
                 var canvas = document.getElementById('canvas');
                 var context = canvas.getContext('2d');
-                canvas.width = 512; // Certain resolutions will display the colours of drawn items incorectly
-                canvas.height = 512;
+                canvas.width = 150; // Certain resolutions will display the colours of drawn items incorectly
+                canvas.height = 150;
 
                 context.fillStyle = 'rgb(100,200,255)';
                 context.fillRect(0,0,canvas.width, canvas.height); //GIF can't do transparent so do white
 
-                context.drawImage(image, 0, 0, 512, 512); // It seems that the encoder does not work with images
+                context.drawImage(image, 0, 0, 150, 150, 100,100,100,100); // It seems that the encoder does not work with images
 
                 context.fillStyle = "rgb(200,50,0)";  
                 context.fillRect (10, 10, 75, 50);   //draw a little red box
@@ -37,8 +37,7 @@
                 var binary_gif = encoder.stream().getData() //notice this is different from the as3gif package!
                 var data_url = 'data:image/gif;base64,'+encode64(binary_gif);
 
-                console.log(data_url);
-                
+                console.log(data_url);  
             }   
         </script>
         

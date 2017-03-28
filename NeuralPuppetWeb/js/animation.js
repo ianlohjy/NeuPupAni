@@ -11,35 +11,93 @@ function Animation()
     const RECORD = 2
     // States
     this.mode = PAUSE;
-    this.last_playback_time = performance.now();
-    /*
-    // GIF Recording & render settings
-    this.gif_encoder = new GIFEncoder();
-    this.last_rendered_frame = performance.now();
-    this.render_fps = 30;
-    this.render_millis_per_frame = 1000/this.render_fps;
-    this.render_length = 5000; // In milliseconds
-    this.render_start_time = 0;
-    this.rendering = false;
-    */
-    // Cursor
-    this.cursor_x = 0;
-    this.cursor_y = 0;
+    this.last_playback_time = time();
+    // Cursor and Frame
+    this.current_frame = 0;
+    // Cursor should not be accessible to anything else. Use current_cursor_pos() instead
+    var cursor_x = 0; 
+    var cursor_y = 0;
 
     Animation.prototype.update = function()
     {   if(this.mode == RECORD)
-        {   this.record(this.cursor_x, this.cursor_y);
+        {   this.record(cursor_x, cursor_y);
         }
-        if(this.rendering)
-        {   this.render();
+        else if(this.mode == PLAY)
+        {
+            if(time() - this.last_playback_time >= this.millis_per_frame)
+            {
+                this.go_to_frame(this.current_frame+1);
+                this.last_playback_time = time();
+            }
         }
     }
 
-    Animation.prototype.update_cursor = function(cursor_x, cursor_y)
-    {   this.cursor_x = cursor_x;
-        this.cursor_y = cursor_y;
+    Animation.prototype.update_cursor = function(input_x, input_y)
+    {   cursor_x = input_x;
+        cursor_y = input_y;
+    }
+    
+    // Playback
+    Animation.prototype.go_to_frame = function(frame)
+    {   let new_frame = frame;
+        if(new_frame > this.data.path.length-1)
+        {   new_frame = 0;
+        }
+        else if(new_frame < 0)
+        {   new_frame = 0;
+        }
+        this.current_frame = new_frame;
+        timeline.update_length()
     }
 
+    Animation.prototype.stop = function()
+    {   this.pause();
+        this.current_frame = 0;
+    }
+
+    Animation.prototype.play = function()
+    {   if(!this.is_recording())
+        {   this.mode = PLAY;
+        }
+    }
+
+    Animation.prototype.pause = function()
+    {
+        this.mode = PAUSE;
+    }
+
+    Animation.prototype.toggle_play = function()
+    {   // Toggles play/pause
+        if(!this.is_recording())
+        {
+            if(this.is_playing())
+            {   this.pause();
+            }
+            else
+            {   this.play();
+            }
+        }
+    }
+
+    Animation.prototype.is_recording = function()
+    {   if(this.mode == RECORD)
+        {   return true;
+        }
+        else
+        {   return false;
+        }
+    }
+
+    Animation.prototype.is_playing = function()
+    {   if(this.mode == PLAY)
+        {   return true;
+        }
+        else
+        {   return false;
+        }
+    }
+
+    /*
     Animation.prototype.render_start = function()
     {   if(!this.rendering)
         {   this.last_rendered_frame = performance.now();
@@ -79,13 +137,17 @@ function Animation()
         let data_url = 'data:image/gif;base64,'+ encode64(binary_gif);
         document.getElementById('render_result').src = data_url;
         //console.log(data_url);
-    }
+    }*/
 
     // Recording
     Animation.prototype.record = function(x, y)
     {   if(performance.now() - this.last_playback_time >= this.millis_per_frame)
         {   this.data.add_point(x,y);
             this.last_playback_time = performance.now();
+            
+            // Update position of current frame and update timeline
+            this.current_frame = this.data.path.length-1;
+            timeline.update_length();
         }
     }
 
@@ -96,7 +158,26 @@ function Animation()
     }
 
     Animation.prototype.stop_recording = function()
-    {   this.mode = PAUSE;
+    {   this.pause();
+        // Update position of current frame and update timeline
+        this.current_frame = this.data.path.length-1;
+        timeline.update_length();
+    }
+
+    Animation.prototype.current_cursor_pos = function()
+    {   
+        if(this.mode == RECORD || this.mode == PAUSE)
+        {   return new Point(cursor_x, cursor_y);
+        }
+        else if(this.mode == PLAY)
+        {
+            if(this.data.path.length !== 0)
+            {   return this.data.path[this.current_frame];
+            }
+            else
+            {   return new Point(0, 0);
+            }
+        }
     }
 }
 
@@ -129,10 +210,32 @@ function AnimData()
         this.image_shape = [rows, cols]; 
     }
 
-    // Point Class
-    function Point(x, y)
-    {   this.x = x;
-        this.y = y;
+    AnimData.prototype.get_grid_position = function(amt_x, amt_y)
+    {   // Returns the area of the image to show given amt_x & amt_y (0 to 1.0)
+        // Find the size of a each grid square
+        let div_x = this.image.width / this.image_shape[0];
+        let div_y = this.image.height/ this.image_shape[1];
+        // Find out which grid square to display
+        let loc_x = Math.floor(amt_x * this.image_shape[0]);
+        let loc_y = Math.floor(amt_y * this.image_shape[1]);
+        // Make sure that grid square is between 0 and grid_shape-1
+        if(loc_x < 0){loc_x = 0};
+        if(loc_x > this.image_shape[0]-1){loc_x = this.image_shape[0]-1};
+        if(loc_y < 0){loc_y = 0};
+        if(loc_y > this.image_shape[1]-1){loc_y = this.image_shape[1]-1};
+        // return the right part of the face_grid
+        var grid_position = 
+        {   x: loc_x*div_x,
+            y: loc_y*div_y,
+            w: div_x,
+            h: div_y,
+        };
+        return grid_position;
     }
 }
 
+// Point Class
+function Point(x, y)
+{   this.x = x;
+    this.y = y;
+}

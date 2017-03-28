@@ -175,7 +175,12 @@ GIFEncoder = function() {
 		} catch (e) {
 			ok = false;
 		}
-		frame_callback();
+		
+		if(frame_callback)
+		{
+			frame_callback();
+		}
+		
 		return ok;
 	};
 

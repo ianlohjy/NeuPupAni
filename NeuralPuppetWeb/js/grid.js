@@ -31,10 +31,12 @@ function Grid()
     // Drawing
     Grid.prototype.draw = function()
     {   // Draws background elements of the grid
-        context.clearRect(0, 0, canvas.width, canvas.height);        
-        context.globalAlpha = 0.25;
+        context.clearRect(0, 0, canvas.width, canvas.height);  
+        context.fillStyle = 'rgb(0,0,0)';
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        //context.globalAlpha = 0.25;
         //context.drawImage(animation.data.image, 0, 0, canvas.width, canvas.height); 
-        context.globalAlpha = 1;
+        //context.globalAlpha = 1;
     }
 
     Grid.prototype.draw_recording = function()
@@ -45,7 +47,7 @@ function Grid()
             context.beginPath();
             context.strokeStyle = 'red';
             context.lineJoin = 'round';
-            context.lineWidth = 2;
+            context.lineWidth = 5;
 
             context.moveTo(path[0].x*canvas.width, path[0].y*canvas.height);
 
@@ -55,6 +57,15 @@ function Grid()
 
             context.stroke(); 
             context.closePath();
+
+            // Draw position of current cursor
+            let cur_x = path[animation.current_frame].x * canvas.width;
+            let cur_y = path[animation.current_frame].y * canvas.height;
+
+            context.fillStyle = 'rgb(255,255,255)';
+            context.beginPath();
+            context.arc(cur_x, cur_y, 8, 0, Math.PI * 2, true); // Frame cursor
+            context.fill();
         }
     }
 

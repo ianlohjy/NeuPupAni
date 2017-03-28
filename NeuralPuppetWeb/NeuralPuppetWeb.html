@@ -16,6 +16,8 @@
         <script type='text/javascript' src='./js/grid.js'></script>
         <script type='text/javascript' src='./js/display.js'></script>
         <script type='text/javascript' src='./js/renderer.js'></script>
+        <script type='text/javascript' src='./js/ui.js'></script>
+
         <script type='text/javascript'>
 
         // Windows
@@ -30,6 +32,10 @@
         var cur_timestamp; // For calculating fps
         var fps;
 
+        // UI
+        var timeline;
+        var play;
+
         function init()
         {
             animation = new Animation();
@@ -38,11 +44,12 @@
             grid = new Grid();
             display = new Display();
             renderer = new Renderer();
-
+            timeline = new Timeline();
+            play = new Play();
             cur_timestamp = time();
             
             register_events(); // Window level events
-            resize_windows();
+            resize_windows(); 
 
             start_loop(loop);
         }
@@ -58,15 +65,24 @@
 
             calculate_fps();
             get_id('fps').innerText = fps + ' FPS'
+
+            get_id('timeline-counter').innerText = animation.current_frame + ' / ' + (animation.data.path.length-1);
         }
 
-        
         function start_render()
-        {   renderer.setup_render(animation.data, 5);
+        {   renderer.setup_render(animation.data, animation.data.path.length-1);
             renderer.start_render();
-            renderer.while_render();
+        }
+        /*
+        function update_render()
+        {   renderer.update_frame();
+        }
+
+        function stop_render()
+        {
             renderer.finish_render();
         }
+        */
 
         // UI
         function resize_windows()
@@ -87,6 +103,8 @@
             display.canvas.element.style.left = parseFloat(grid.canvas.element.style.left) + parseFloat(grid.canvas.width) + 'px';
             display.canvas.width = window_width;
             display.canvas.height = parseFloat(grid.canvas.height);
+
+            get_id('timeline').style.width = window_width*2 + 'px';
         }
 
         // EVENTS
@@ -138,7 +156,7 @@
                 height: 100%;
                 padding: 0px;
                 margin: 0px;
-                overflow: hidden;
+                /*overflow: hidden;*/
             }
 
             #anim-windows
@@ -159,14 +177,40 @@
             }
 
             #fps
-            {   position: relative;
-                padding-left: 5px;
-                margin: 0px;
-                font-family: Arial, Helvetica, sans-serif;
+            {   font-family: Arial, Helvetica, sans-serif;
             }
+
             .no-space
             {   padding: 0px;
                 margin: 0px;
+            }
+
+            #timeline
+            {   margin-top:15px;
+                display: block;
+            }
+
+            .readout
+            {   margin-left: 10px;
+                margin-bottom: 10px;
+                display: inline-block;
+                font-family: Arial, Helvetica, sans-serif;
+            }
+
+            .button
+            {   float: left;
+                margin: 10px;
+                padding: 5px;
+            }
+
+            .wide
+            {   width: 100%;
+                display: inline-block;
+                /*background-color:red;*/
+            }
+
+            #render_result
+            {   width: 500px;
             }
             
         </style>
@@ -177,9 +221,27 @@
             <canvas id='anim-grid'></canvas>
             <canvas id='anim-display'></canvas>
         </div>
-        <p id='fps'></p>
-        <button id='record' onclick='start_render()'>RECORD GIF</button>
-        <img id='render_result'>
+
+        <input type='range' id='timeline' value='5000'>
+        
+        <div class='wide'>
+            <button id='play-button' class='button'>PLAY</button>
+            <p id='timeline-counter' class='readout'></p>
+        </div>
+
+        <div class='wide'>
+            <button id='render-button' class='button' onclick='start_render()'>RENDER</button>
+            <p id='render-status' class='readout'>NOT RENDERING</p>
+        </div>
+
+        <div class='wide'>
+            <p id='fps' class='readout'></p>
+        </div>
+
+        <div class='wide'>
+            <img id='render_result'>
+        </div>
+
     </body>
 
 </html>
