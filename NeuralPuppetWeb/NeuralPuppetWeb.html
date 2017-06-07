@@ -11,6 +11,7 @@
         <script type="text/javascript" src="./js/jsgif/GIFEncoder.js"></script>
         <script type="text/javascript" src="./js/jsgif/b64.js"></script>
 
+        <script type='text/javascript' src='./js/utils.js'></script>  
         <script type='text/javascript' src='./js/canvasy/canvasy.js'></script>
         <script type='text/javascript' src='./js/animation.js'></script>
         <script type='text/javascript' src='./js/grid.js'></script>
@@ -34,7 +35,6 @@
 
         // UI
         var timeline;
-        var play;
 
         function init()
         {
@@ -45,9 +45,10 @@
             display = new Display();
             renderer = new Renderer();
             timeline = new Timeline();
-            play = new Play();
             cur_timestamp = time();
             
+
+            setup_ui();
             register_events(); // Window level events
             resize_windows(); 
 
@@ -217,6 +218,15 @@
     </head>
 
     <body onload='init()'>
+
+        <div class='wide'>
+            <a id='save-json-button' href='default.json' target='_blank' download='path.json'>
+                <button class='button'>SAVE PATH</button>
+            </a>
+            <input id='load-json-button' type='file' class='button'>
+            </input>
+        </div>
+        
         <div id='anim-windows' class='no-space'>
             <canvas id='anim-grid'></canvas>
             <canvas id='anim-display'></canvas>

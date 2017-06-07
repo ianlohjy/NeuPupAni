@@ -17,6 +17,8 @@ function Animation()
     // Cursor should not be accessible to anything else. Use current_cursor_pos() instead
     var cursor_x = 0; 
     var cursor_y = 0;
+    // JSON File Reading
+    this.json_reader = new JSONReader();
 
     Animation.prototype.update = function()
     {   if(this.mode == RECORD)
@@ -97,48 +99,6 @@ function Animation()
         }
     }
 
-    /*
-    Animation.prototype.render_start = function()
-    {   if(!this.rendering)
-        {   this.last_rendered_frame = performance.now();
-            render_start_time = performance.now();
-            this.rendering = true;
-
-            this.gif_encoder.setRepeat(0);
-            this.gif_encoder.setDelay(this.render_millis_per_frame); // Render at 20 frames per second for now 
-            this.gif_encoder.start();
-            console.log('GIF RENDER STARTED');
-        }
-        else
-        {   console.log('ALREADY RENDERING!');
-        }
-    }
-
-    Animation.prototype.render = function()
-    {
-        if(performance.now() - this.render_start_time >= this.render_length)
-        {
-            this.render_stop();
-        }
-        else if(performance.now() - this.last_rendered_frame >=  this.render_millis_per_frame)
-        {   
-            this.last_rendered_frame = performance.now();
-            this.gif_encoder.addFrame(grid.context); // << THIS IS BAD, FIX LATER!
-            console.log('RENDERING...');
-        }
-    }
-
-    Animation.prototype.render_stop = function()
-    {   this.rendering = false;
-        this.gif_encoder.finish();
-        console.log('GIF RENDER STOPPED');
-
-        let binary_gif = this.gif_encoder.stream().getData() //notice this is different from the as3gif package!
-        let data_url = 'data:image/gif;base64,'+ encode64(binary_gif);
-        document.getElementById('render_result').src = data_url;
-        //console.log(data_url);
-    }*/
-
     // Recording
     Animation.prototype.record = function(x, y)
     {   if(performance.now() - this.last_playback_time >= this.millis_per_frame)
@@ -179,6 +139,36 @@ function Animation()
             }
         }
     }
+
+    // JSON
+    Animation.prototype.load_json = function(files)
+    {
+        // This will run when json is loaded
+        let on_load_json_callback = function(json)
+        {
+            animation.data.load_json(json);
+        }
+
+        // Load the first file from the file list
+        this.json_reader.read_json(files[0],on_load_json_callback);
+    }
+
+    /*
+    // Depreceated
+    Animation.prototype.on_json_failed = function()
+    {
+
+    }
+
+    Animation.prototype.on_json_loaded = function()
+    {
+        console.log('hi');
+    }
+    */
+
+    Animation.prototype.get_json = function()
+    {   return this.data.get_json();
+    }
 }
 
 function AnimData()
@@ -193,6 +183,38 @@ function AnimData()
     {   get: function(){return this.path.length;}
     });
 
+    // JSON 
+    AnimData.prototype.get_json = function()
+    {
+        let json_points = new Array();
+
+        for(var p=0; p<this.path.length; p++)
+        {   let json_point = new Array();
+            json_point.push(this.path[p].x);
+            json_point.push(this.path[p].y);
+            json_points.push(json_point);
+        }
+
+        let json_output =
+        {   points:json_points,
+        };
+
+        return JSON.stringify(json_output);
+    }
+
+    AnimData.prototype.load_json = function(json)
+    {   // Load path from json file
+        animation.stop();
+        timeline.update_length();
+        let points = json.points;
+        this.clear();    
+        for(var p=0; p<points.length; p++)
+        {
+            this.add_point(points[p][0],points[p][1]);
+        }
+    }
+
+    // Point operations
     AnimData.prototype.add_point = function(x, y)
     {   // Adds a Point object to this.path
         this.path.push(new Point(x,y));
@@ -239,3 +261,4 @@ function Point(x, y)
 {   this.x = x;
     this.y = y;
 }
+
