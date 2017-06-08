@@ -1,5 +1,5 @@
-function Renderer()
-{   // Handles rendering of Animation.data
+function RenderWorker()
+{   // Implementation test of renderer with webworkers
     
     // GIF Recorder 
     this.gif_encoder = new GIFEncoder();

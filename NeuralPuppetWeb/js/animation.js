@@ -4,7 +4,8 @@ function Animation()
     this.target_fps = 60;
     this.millis_per_frame = 1000/this.target_fps;
     // Animation Data
-    this.data = new AnimData();
+    /*this.data_list = new Array(); // All animation data that has been loaded */
+    this.data = new AnimData(); // Represents current animation data
     // Constants
     const PAUSE  = 0; // This is the default fallback state
     const PLAY   = 1; 
@@ -153,30 +154,20 @@ function Animation()
         this.json_reader.read_json(files[0],on_load_json_callback);
     }
 
-    /*
-    // Depreceated
-    Animation.prototype.on_json_failed = function()
-    {
-
-    }
-
-    Animation.prototype.on_json_loaded = function()
-    {
-        console.log('hi');
-    }
-    */
-
     Animation.prototype.get_json = function()
     {   return this.data.get_json();
     }
+
 }
 
 function AnimData()
 {   // Handles all animation data
     this.path = new Array();
     // Image Data
+    this.image_list = new Array(); // Array of Images
+    this.current_grid_index = 0;
     this.image = null;
-    this.image_shape = [1, 1];
+    this.image_shape = [1, 1]; // Default value 
 
     // Data Properties
     Object.defineProperty(this, 'size',
@@ -225,12 +216,51 @@ function AnimData()
         this.path = new Array();
     }
 
+    AnimData.prototype.add_grid_image = function(src, rows, cols)
+    {   // Adds a grid image to image_list
+        let new_image_shape = [rows, cols];
+        let new_image = new Image();
+        new_image.src = src;
+        
+        let image_data = {};
+        image_data.image = new_image;
+        image_data.shape = new_image_shape;
+
+        this.image_list.push(image_data);
+        //console.log(image_data.shape);
+        //console.log(this.image_list.indexOf(image_data));
+    }
+
+    AnimData.prototype.next_grid = function()
+    {
+        this.set_grid((this.current_grid_index+1)%this.image_list.length);
+    }
+
+    AnimData.prototype.prev_grid = function()
+    {
+        let new_index = this.current_grid_index-1 < 0 ? this.image_list.length-1: this.current_grid_index-1;
+        this.set_grid(new_index);
+    }
+
+    AnimData.prototype.set_grid = function(index)
+    {   // Sets the grid
+        if(index < this.image_list.length)
+        {
+            let image_data = this.image_list[index]; 
+            this.image = image_data.image;
+            this.image_shape = image_data.shape;    
+            this.current_grid_index = index;   
+        }
+        else return; 
+    }
+
+    /*
     AnimData.prototype.set_grid_image = function(src, rows, cols)
     {   // Sets up image
         this.image = new Image();
         this.image.src = src;
         this.image_shape = [rows, cols]; 
-    }
+    }*/
 
     AnimData.prototype.get_grid_position = function(amt_x, amt_y)
     {   // Returns the area of the image to show given amt_x & amt_y (0 to 1.0)

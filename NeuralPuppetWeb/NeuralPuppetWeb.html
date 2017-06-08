@@ -39,8 +39,12 @@
         function init()
         {
             animation = new Animation();
-            animation.data.set_grid_image('./imgs/open_smile.png', 7, 7);
-
+           
+            animation.data.add_grid_image('./imgs/OpenSmile1.png', 7, 7);
+            animation.data.add_grid_image('./imgs/OpenSmile2.png', 7, 7);
+            animation.data.add_grid_image('./imgs/PaleDisgust.png', 7, 7);
+            animation.data.set_grid(0);
+            
             grid = new Grid();
             display = new Display();
             renderer = new Renderer();
@@ -71,7 +75,8 @@
         }
 
         function start_render()
-        {   renderer.setup_render(animation.data, animation.data.path.length-1);
+        {  
+            renderer.setup_render(animation.data, animation.data.path.length-1);
             renderer.start_render();
         }
         /*
@@ -220,6 +225,8 @@
     <body onload='init()'>
 
         <div class='wide'>
+            <a> <button onclick='animation.data.prev_grid();' class='button'>Prev Grid</button> </a>
+            <a> <button onclick='animation.data.next_grid();' class='button'>Next Grid</button> </a>
             <a id='save-json-button' href='default.json' target='_blank' download='path.json'>
                 <button class='button'>SAVE PATH</button>
             </a>

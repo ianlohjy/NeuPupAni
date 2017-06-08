@@ -34,9 +34,9 @@ function Grid()
         context.clearRect(0, 0, canvas.width, canvas.height);  
         context.fillStyle = 'rgb(0,0,0)';
         context.fillRect(0, 0, canvas.width, canvas.height);
-        //context.globalAlpha = 0.25;
-        //context.drawImage(animation.data.image, 0, 0, canvas.width, canvas.height); 
-        //context.globalAlpha = 1;
+        context.globalAlpha = 0.25;
+        context.drawImage(animation.data.image, 0, 0, canvas.width, canvas.height); 
+        context.globalAlpha = 1;
     }
 
     Grid.prototype.draw_recording = function()
@@ -45,18 +45,25 @@ function Grid()
         {   let path = animation.data.path;   
             
             context.beginPath();
-            context.strokeStyle = 'red';
+            context.strokeStyle = 'rgb(255,0,0)';
+            context.lineCap = 'round';
             context.lineJoin = 'round';
             context.lineWidth = 5;
 
-            context.moveTo(path[0].x*canvas.width, path[0].y*canvas.height);
-
-            for(var p=0; p<path.length; p++)
-            {   context.lineTo(path[p].x*canvas.width, path[p].y*canvas.height);
+            for(var p=0; p<path.length-1; p++)
+            {   //let stroke_colour = (p/path.length)*200.0;
+                //console.log(p/path.length);
+                //context.strokeStyle = 'rgb('+(stroke_colour+55)+','+0+','+0+')';
+                
+                context.beginPath();
+                context.moveTo(path[p].x*canvas.width, path[p].y*canvas.height);
+                context.lineTo(path[p+1].x*canvas.width, path[p+1].y*canvas.height);
+                context.stroke(); 
+                context.closePath();
             } 
 
-            context.stroke(); 
-            context.closePath();
+            //context.stroke(); 
+            //context.closePath();
 
             // Draw position of current cursor
             let cur_x = path[animation.current_frame].x * canvas.width;
