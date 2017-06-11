@@ -4,7 +4,7 @@
     
     <head>
         <meta charset='utf-8'/>
-        <title>Neural Puppet Web Port</title>
+        <title>TopoSketch Web App</title>
         
         <script type="text/javascript" src="./js/jsgif/LZWEncoder.js"></script>
         <script type="text/javascript" src="./js/jsgif/NeuQuant.js"></script>
@@ -19,270 +19,91 @@
         <script type='text/javascript' src='./js/renderer.js'></script>
         <script type='text/javascript' src='./js/ui.js'></script>
 
-        <script type='text/javascript'>
+        <script type='text/javascript' src='./js/main.js'></script>
+        
+        <link rel='stylesheet' href='./css/normalize.css'>
+        <link rel='stylesheet' href='./css/skeleton.css'>
+        <link rel='stylesheet' href='./css/styles.css'>
 
-        // Windows
-        var grid;
-        var display;
-        var test;
-        // Animation
-        var animation;
-        var renderer;
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
 
-        // Utilities
-        var cur_timestamp; // For calculating fps
-        var fps;
-
-        // UI
-        var timeline;
-
-        function init()
-        {
-            animation = new Animation();
-           
-            animation.data.add_grid_image('./imgs/OpenSmile1.png', 7, 7);
-            animation.data.add_grid_image('./imgs/OpenSmile2.png', 7, 7);
-            animation.data.add_grid_image('./imgs/PaleDisgust.png', 7, 7);
-            animation.data.set_grid(0);
-            
-            grid = new Grid();
-            display = new Display();
-            renderer = new Renderer();
-            timeline = new Timeline();
-            cur_timestamp = time();
-            
-
-            setup_ui();
-            register_events(); // Window level events
-            resize_windows(); 
-
-            start_loop(loop);
-        }
-
-        function loop()
-        {
-            animation.update_cursor(grid.canvas.mouse_x/ grid.canvas.width,
-                                    grid.canvas.mouse_y/ grid.canvas.height);
-            animation.update();
-
-            grid.update();
-            display.update();
-
-            calculate_fps();
-            get_id('fps').innerText = fps + ' FPS'
-
-            get_id('timeline-counter').innerText = animation.current_frame + ' / ' + (animation.data.path.length-1);
-        }
-
-        function start_render()
-        {  /*
-            if(window.Worker)
-            {
-                var render_worker = new Worker('./js/render_worker.js');
-                render_worker.postMessage('Start Render');
-            }*/
-
-            /*// Render Worker Test
-            if(window.Worker)
-            {   console.log('Web workers supported');
-                var test_worker = new Worker('./js/sample_worker.js');
-                test_worker.postMessage('Hi worker!');
-
-                test_worker.onmessage = function(event)
-                {   console.log('Received message from web worker');
-                    console.log(event);
-                }
-            }
-            else 
-            {
-                console.log('Web workers not supported in your browser!');
-            }*/
-            
-
-            renderer.setup_render(animation.data, animation.data.path.length-1);
-            renderer.start_render();
-
-        }
-        /*
-        function update_render()
-        {   renderer.update_frame();
-        }
-
-        function stop_render()
-        {
-            renderer.finish_render();
-        }
-        */
-
-        // UI
-        function resize_windows()
-        {   // Positions and resizes windows. 
-            // parseFloat() is used to get values or
-            // they will return with 'px' at the end 
-            let window_width = window.innerWidth/2;
-
-            // Limit max size
-            if(window_width > 500) window_width = 500;
-           
-            grid.canvas.element.style.top = '0px';
-            grid.canvas.element.style.left = '0px';
-            grid.canvas.width = window_width;
-            grid.canvas.height = parseFloat(grid.canvas.width);
-
-            display.canvas.element.style.top = parseFloat(grid.canvas.element.style.top) + 'px';
-            display.canvas.element.style.left = parseFloat(grid.canvas.element.style.left) + parseFloat(grid.canvas.width) + 'px';
-            display.canvas.width = window_width;
-            display.canvas.height = parseFloat(grid.canvas.height);
-
-            get_id('timeline').style.width = window_width*2 + 'px';
-        }
-
-        // EVENTS
-        function on_resize()
-        {   // Called with window is resized
-            resize_windows();
-        }
-
-        function register_events()
-        {   // Register any document / window level events here
-            window.onresize = on_resize;
-        }
-
-        // UTILITY
-        function get_id(id)
-        {   // Shortify wrapper to get elements
-            return document.getElementById(id);
-        }
-
-        function start_loop(func)
-        {   // Wrapper to loop a function using requestAnimationFrame()
-            var looped = function()
-            {   func();
-                window.requestAnimationFrame(looped);
-            }
-            var animation_request = requestAnimationFrame(looped);
-            // Returns the animation request ID, so you can stop it 
-            // using cancelAnimationFrame() 
-            return animation_request; 
-        }
-
-        function calculate_fps()
-        {   // Calculates FPS
-            let time_diff = time() - cur_timestamp;
-            cur_timestamp = time();
-            fps = (1000/time_diff).toFixed(1);
-        }
-
-        function time()
-        {   // Wrapper for performance.now()
-            return performance.now();
-        }
-
-        </script>
-
-        <style type='text/css'>
-            html, body
-            {   width: 100%;
-                height: 100%;
-                padding: 0px;
-                margin: 0px;
-                /*overflow: hidden;*/
-            }
-
-            #anim-windows
-            {   position: relative;
-                width: 100%;
-                height: auto;
-            }
-
-            #anim-grid
-            {   position: relative;
-                background-color: grey;
-                cursor: cell;
-            }
-
-            #anim-display
-            {   position: absolute;
-                background-color: cyan;
-            }
-
-            #fps
-            {   font-family: Arial, Helvetica, sans-serif;
-            }
-
-            .no-space
-            {   padding: 0px;
-                margin: 0px;
-            }
-
-            #timeline
-            {   margin-top:15px;
-                display: block;
-            }
-
-            .readout
-            {   margin-left: 10px;
-                margin-bottom: 10px;
-                display: inline-block;
-                font-family: Arial, Helvetica, sans-serif;
-            }
-
-            .button
-            {   float: left;
-                margin: 10px;
-                padding: 5px;
-            }
-
-            .wide
-            {   width: 100%;
-                display: inline-block;
-                /*background-color:red;*/
-            }
-
-            .render_result
-            {   /*width: 500px;*/
-                float: left;
-            }
-            
-        </style>
     </head>
 
-    <body onload='init()'>
+    <body onload='init();'>
 
-        <div class='wide'>
-            <a> <button title='HI!' onclick='animation.data.prev_grid();' class='button'>Prev Grid</button> </a>
-            <a> <button onclick='animation.data.next_grid();' class='button'>Next Grid</button> </a>
-            <a id='save-json-button' href='default.json' target='_blank' download='path.json'>
-                <button class='button'>SAVE PATH</button>
-            </a>
-            <input id='load-json-button' type='file' class='button'>
-            </input>
-        </div>
-        
-        <div id='anim-windows' class='no-space'>
-            <canvas id='anim-grid'></canvas>
-            <canvas id='anim-display'></canvas>
-        </div>
+        <div class='container'>
+                <h1 class='title' style='margin-top:1em;'>TopoSketch Demo</h1>
+                <!--<h5 class='subtitle' style='margin-top:-0.2em;line-height:1.3em;'>Generating Animations by Sketching in Conceptual Space</h5>-->
+                <p>
+                TopoSketch is a tool for prototyping facial animations by sketching gestures. Posing and animating a believable face is a complex process, requiring many different features to work in tandem (eg: the eyes narrowing during a smile). Using neural networks, TopoSketch creates a high level expression based control that simplies this process. Drawn gestures are then used to control the blending and timing between different expressions to create an animation. 
+                </p>
 
-        <input type='range' id='timeline' value='5000'>
-        
-        <div class='wide'>
-            <button id='play-button' class='button'>PLAY</button>
-            <p id='timeline-counter' class='readout'></p>
-        </div>
+                <p><a href='https://vusd.github.io/toposketch' target='_blank'>vusd.github.io/toposketch</a> </p>
 
-        <div class='wide'>
-            <button id='render-button' class='button' onclick='start_render()'>RENDER</button>
-            <p id='render-status' class='readout'></p>
-        </div>
+                <div class='twelve columns toolbar' style="background-color:none;">
+               
+                <button title='Load previous grid' onclick='animation.data.prev_grid();' class='tool-button'>
+                    <img src="./imgs/icons/ic_grid_left_24px.svg"> </button>
+               
+               <button title='Load next grid' onclick='animation.data.next_grid();' class='tool-button'>
+                   <img src="./imgs/icons/ic_grid_right_24px.svg"> </button>
 
-        <div class='wide'>
-            <p id='fps' class='readout'></p>
-        </div>
+                <a id='save-json-button' href='default.json' target='_blank' download='path.json'>
+                    <button title='Save path' class='tool-button'>
+                        <p> Export Path </p>
+                    </button> 
+                </a>
+                
+                <!-- File inputs are notorious to style, so this is a workaround-->
+                <div class='tool-button file-input-container'>
+                    <p>Load Path</p>
+                    <input id='load-json-button' class='file-input-button' type='file'>
+                    </input>
+                </div>
 
-        <div id='render_container' class='wide'>
-        </div>
+                <button id='clear-button' class='tool-button' onclick="animation.data.clear()">
+                    <p>Clear Path</p>
+                </button>
 
+                <div class='tool-button' class='file-input-container'> 
+                    <p>Add Grid</p>
+                    <input id='load-grid-button' class='file-input-button'  type='file'></input>
+                </div>
+
+                <button id='render-button' class='tool-button'>
+                    Render Animation
+                </button>
+
+            </div>
+            
+            <div id='anim-windows' class='twelve columns' style="background-color:red;">
+                <canvas id='anim-grid' class='six columns' style="background-color:blue;"></canvas>
+                <canvas id='anim-display' class='six columns'></canvas>
+            </div>
+
+
+            <div class='twelve columns toolbar' id='play-toolbar' style='margin-bottom:2em;'>
+                <div id='play-button-container'>
+                    <button id='play-button' class='tool-button'>
+                        <img id='play-button-icon' src="./imgs/icons/ic_play_arrow_black_24px.svg">
+                    </button>
+                </div>
+                <div id='timeline-container'>
+                    <input type='range' id='timeline' value='5000'>
+                    <p id='timeline-counter' class='readout'></p>
+                </div>
+            </div> 
+
+            <h4 class='title' style='margin-top:1em;'>Rendered Animations</h4>
+            <p id='no-animations-sign'>No animations yet, render something!</p>
+            <div id='render-container' class='twelve columns'>
+                <!--<div id='placement-guide'></div> renders will be placed before to this element-->
+            </div>
+
+            <div class='twelve columns' style="display:none;">
+                <p id='fps' class='readout'></p>
+            </div> 
+
+        </div>
     </body>
-
 </html>

@@ -27,7 +27,7 @@ self.onmessage = function(event) {
         encoder.setDelay(content['delay']);
         encoder.setFrameCallback(add_frame_callback);
         cur_frame = 0;
-        console.log('OK!');
+        console.log('Setting up render worker... OK!');
     }
     else if(command == 'start')
     {   //console.log('Starting encoder');

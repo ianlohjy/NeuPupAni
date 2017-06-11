@@ -147,7 +147,10 @@ function Animation()
         // This will run when json is loaded
         let on_load_json_callback = function(json)
         {
-            animation.data.load_json(json);
+            try
+            {   animation.data.load_json(json);}
+            catch(exception)
+            {}
         }
 
         // Load the first file from the file list
@@ -218,15 +221,21 @@ function AnimData()
 
     AnimData.prototype.add_grid_image = function(src, rows, cols)
     {   // Adds a grid image to image_list
-        let new_image_shape = [rows, cols];
-        let new_image = new Image();
-        new_image.src = src;
-        
-        let image_data = {};
-        image_data.image = new_image;
-        image_data.shape = new_image_shape;
+        try
+        {   let new_image_shape = [rows, cols];
+            let new_image = new Image();
+            new_image.src = src;
+            
+            let image_data = {};
+            image_data.image = new_image;
+            image_data.shape = new_image_shape;
 
-        this.image_list.push(image_data);
+            this.image_list.push(image_data);
+            this.set_grid(this.image_list.length-1);
+        }
+        catch(exception)
+        {   console.log('Could not add grid image!');
+        }
         //console.log(image_data.shape);
         //console.log(this.image_list.indexOf(image_data));
     }

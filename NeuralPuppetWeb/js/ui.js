@@ -1,7 +1,16 @@
+// UI
+var timeline;
+var play_button;
+var save_json_button;
+var load_json_button;
+var render_button;
+var load_grid_button;
+
 function Timeline()
 {
     var element = document.getElementById('timeline');
-
+    var frame_readout = document.getElementById('timeline-counter');
+    
     // Timeline Data
     Object.defineProperty(this, 'value',
     {   get: function(){return element.value;},
@@ -21,6 +30,9 @@ function Timeline()
 
     Timeline.prototype.on_change = function()
     {   animation.go_to_frame(Math.round(element.value));
+        animation.pause();
+        play_button.update_state();
+        //console.log(element.clientLeft + element.clientWidth);
     }
 
     Timeline.prototype.update_length = function()
@@ -30,12 +42,68 @@ function Timeline()
             this.value = animation.current_frame;
         }
     }
+
+    Timeline.prototype.update_width = function()
+    {
+        //element.style.width = '100%';
+        //element.style.width = (element.clientWidth - play_button.element.clientWidth - 6) + 'px';
+    }
+
+    this.setup();
+}
+
+function RenderButton()
+{   
+    this.element = document.getElementById('render-button');
+    var render_button = this;
+
+    this.on_click = function()
+    {   //console.log(renderer.rendering);
+        if(!renderer.rendering)
+        {
+            renderer.setup_render(animation.data, animation.data.path.length-1);
+            renderer.start_render();
+        }
+        else if(renderer.rendering)
+        {   
+            renderer.stop_render();
+        }
+    }
+
+    RenderButton.prototype.set_label = function(message)
+    {   this.element.innerHTML = message;
+        if(renderer.rendering)
+        {
+            this.element.innerHTML = message + ' (Click to cancel)';
+        }
+    }
+
+    RenderButton.prototype.reset_label_in = function(timer)
+    {   
+        setTimeout(
+            function()
+            {
+                if(!renderer.rendering)
+                {
+                    render_button.set_label('Render Animation');
+                }
+            }, 
+            timer
+        );
+    }
+
+    RenderButton.prototype.setup = function ()
+    {   
+       this.element.onclick = this.on_click;
+       this.set_label('Render Animation');
+    }
+
     this.setup();
 }
 
 function PlayButton()
 {   
-    var element = document.getElementById('play-button');
+    this.element = document.getElementById('play-button');
     var play_button = this;
 
     this.on_click = function()
@@ -46,16 +114,18 @@ function PlayButton()
     PlayButton.prototype.update_state = function ()
     {
         if(animation.is_playing())
-        {   element.innerText = 'PAUSE';
+        {   get_id('play-button-icon').src='./imgs/icons/ic_stop_black_24px.svg';
+            //element.innerText = 'Pause';
         }
         else
-        {   element.innerText = 'PLAY!';
+        {   get_id('play-button-icon').src='./imgs/icons/ic_play_arrow_black_24px.svg';
+            //element.innerText = 'Play';
         }
     }
 
     PlayButton.prototype.setup = function ()
     {   
-        element.onclick = this.on_click;
+        this.element.onclick = this.on_click;
         this.update_state();
     }
 
@@ -74,6 +144,7 @@ function SaveJsonButton()
 
     this.on_click = function(e)
     {
+        //console.log("Saving JSON");
         button.append_json();
     }
 
@@ -111,6 +182,33 @@ function LoadJsonButton()
     this.setup();
 }
 
+function LoadGridButton()
+{
+    var element = document.getElementById('load-grid-button');
+    var button = this;
+
+    this.on_change = function(e)
+    {   // From: https://stackoverflow.com/questions/12368910/html-display-image-after-selecting-filename
+        let selected_file = e.target.files[0];
+
+        let file_reader = new FileReader();
+
+        file_reader.onload = function(e)
+        {
+            animation.data.add_grid_image(e.target.result, 7, 7);
+        }
+        
+        file_reader.readAsDataURL(selected_file);
+    }
+
+    LoadGridButton.prototype.setup = function ()
+    {   
+        element.onchange = this.on_change;
+    }
+
+    this.setup();
+}
+
 function setup_ui()
 {   // Prevent middle click pan from messing up window
     document.addEventListener ("click", function (e) 
@@ -118,9 +216,12 @@ function setup_ui()
         e.preventDefault();
     });
 
-    var play_button = new PlayButton();
-    var save_json_button = new SaveJsonButton();
-    var load_json_button = new LoadJsonButton();
+    play_button = new PlayButton();
+    save_json_button = new SaveJsonButton();
+    load_json_button = new LoadJsonButton();
+    render_button = new RenderButton();
+    load_grid_button = new LoadGridButton();
+    timeline = new Timeline();
 }
 
 

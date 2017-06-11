@@ -2,7 +2,8 @@ function Grid()
 {
     var canvas  = new Canvasy('anim-grid'); // Canvasy
     var context = canvas.context; // Canvas context
-    
+    var mouse_over = false;
+
     var mouse_down = function(event)
     {
         animation.start_recording
@@ -14,12 +15,22 @@ function Grid()
     {   animation.stop_recording();
     }
 
+    var mouse_enter = function()
+    {   mouse_over = true;
+    }
+
+    var mouse_leave = function()
+    {   mouse_over = false;
+    }
+
     // Initialization & Update
     Grid.prototype.setup = function()
     {
         canvas.setup_mouse_events();
         canvas.mouse_down = mouse_down;
         canvas.mouse_up = mouse_up;
+        canvas.mouse_enter = mouse_enter;
+        canvas.mouse_leave = mouse_leave;
     }
 
     Grid.prototype.update = function()
@@ -31,12 +42,25 @@ function Grid()
     // Drawing
     Grid.prototype.draw = function()
     {   // Draws background elements of the grid
+        let alphas = 0.5;
+        
+        if(!mouse_over && animation.data.path.length == 0 || animation.data.path == null)
+        {   alphas = 0.25;
+        }
+
         context.clearRect(0, 0, canvas.width, canvas.height);  
         context.fillStyle = 'rgb(0,0,0)';
         context.fillRect(0, 0, canvas.width, canvas.height);
-        context.globalAlpha = 0.25;
+        context.globalAlpha = alphas;
         context.drawImage(animation.data.image, 0, 0, canvas.width, canvas.height); 
         context.globalAlpha = 1;
+
+        if(!mouse_over && animation.data.path.length == 0 || animation.data.path == null)
+        {   context.font = "1.6em Open Sans";
+            context.fillStyle = "white";
+            context.textAlign = "center";
+            context.fillText("Draw here to animate", canvas.width/2, canvas.height/2); 
+        }  
     }
 
     Grid.prototype.draw_recording = function()
@@ -44,7 +68,7 @@ function Grid()
         if(animation.data.size > 0)
         {   let path = animation.data.path;   
             
-            context.beginPath();
+            //context.beginPath();
             context.strokeStyle = 'rgb(255,0,0)';
             context.lineCap = 'round';
             context.lineJoin = 'round';

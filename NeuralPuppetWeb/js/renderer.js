@@ -56,7 +56,7 @@ function Renderer()
     // Utilities
     Renderer.prototype.update_status = function(message)
     {   //console.log(message);
-        document.getElementById('render-status').innerText = message;
+        render_button.set_label(message);
     }
 
     // Render Methods     
@@ -103,6 +103,7 @@ function Renderer()
     {
         if(this.animation_data == null)
         {   this.update_status('Nothing to render. Draw something to render!');
+            render_button.reset_label_in(3000);
             return;
         }
         else if(this.animation_data.path.length > 0)
@@ -129,7 +130,7 @@ function Renderer()
     {   // This method is continuously called until rendering is complete
         
         if(frame < this.animation_data.path.length)
-        {   this.update_status('Rendering ' + frame + ' / ' + (this.animation_data.path.length-1));
+        {   this.update_status('Rendered ' + frame + ' / ' + (this.animation_data.path.length-1));
             // If the frame to render is less than path length
             let current_pos = this.animation_data.path[frame];
             let grid_pos = this.animation_data.get_grid_position(current_pos.x, current_pos.y);
@@ -186,19 +187,87 @@ function Renderer()
             this.gif_encoder.finish();
             renderer.show_render(this.gif_encoder.stream().getData());
         }
+    }
 
-        this.reset_render();
+    Renderer.prototype.render_path_image = function()
+    {
+        let context = this.rendered_context;
+        let canvas = this.rendered_canvas;
+        //console.log(renderer.animation_data);
+        let path = this.animation_data.path;
+
+        context.clearRect(0,0,canvas.width, canvas.height);
+        context.fillStyle = 'rgb(255,255,255)';
+        context.fillRect(0,0,canvas.width,canvas.height);
+
+        context.strokeStyle = 'rgb(0,0,0)';
+        context.lineCap = 'round';
+        context.lineJoin = 'round';
+        context.lineWidth = 5;
+
+        for(var p=0; p<path.length-1; p++)
+        {   context.beginPath();
+            context.moveTo(path[p].x*canvas.width, path[p].y*canvas.height);
+            context.lineTo(path[p+1].x*canvas.width, path[p+1].y*canvas.height);
+            context.stroke(); 
+            context.closePath();
+        }
+
+        // Draw position of current cursor
+        let cur_x = path[0].x * canvas.width;
+        let cur_y = path[0].y * canvas.height;
+
+        context.fillStyle = 'rgb(0,0,0)';
+        context.beginPath();
+        context.arc(cur_x, cur_y, 8, 0, Math.PI * 2, true); // Frame cursor
+        context.fill();
+
+        let data_url = this.rendered_canvas.element.toDataURL();
+        return data_url;
     }
 
     Renderer.prototype.show_render = function(binary_gif)
-    {   this.update_status('Complete! Animation added to grid')
+    {   // Add path and rendered animation to a container and append to web page
         render_output = 'data:image/gif;base64,'+encode64(binary_gif);
 
-        let image = document.createElement('img');
-        image.src = render_output;
+        let container = document.createElement('div'); // Container for render
+        let animation = document.createElement('img'); // Animated image
+        let path = document.createElement('img'); // Path overlay
 
-        image.classList.add('render_result');
-        document.getElementById('render_container').appendChild(image);
+        let path_image = this.render_path_image();
+        animation.src = render_output;
+        path.src = path_image;
+
+        container.classList.add('three');
+        container.classList.add('columns');
+        container.classList.add('render_result_container');
+        animation.classList.add('render_result_image');
+        path.classList.add('render_result_path');
+
+        container.appendChild(animation);
+        container.appendChild(path);
+
+        document.getElementById('render-container').insertBefore(container,get_id('render-container').children[0]);
+        
+        get_id('no-animations-sign').style.display = 'none';
+        
+        this.reset_render();
+        this.update_status('Complete! Animation added to grid')
+        render_button.reset_label_in(3000);
+    }
+
+    Renderer.prototype.stop_render = function()
+    {           
+        if(this.render_worker != null)
+        {   this.render_worker.terminate();
+            //this.render_worker.postMessage(['kill','']);
+        }
+        else
+        {
+            this.gif_encoder.finish();
+        }
+        this.reset_render();
+        this.update_status('Render Animation');
     }
 
     Renderer.prototype.reset_render = function()
