@@ -42,42 +42,59 @@
 
                 <div class='twelve columns toolbar' style="background-color:none;">
                
-                <button title='Load previous grid' onclick='animation.data.prev_grid();' class='tool-button'>
+                <button title='Previous grid' onclick='animation.data.prev_grid();' class='tool-button'>
                     <img src="./imgs/icons/ic_grid_left_24px.svg"> </button>
                
-               <button title='Load next grid' onclick='animation.data.next_grid();' class='tool-button'>
+               <button title='Next grid' onclick='animation.data.next_grid();' class='tool-button'>
                    <img src="./imgs/icons/ic_grid_right_24px.svg"> </button>
 
-                <a id='save-json-button' href='default.json' target='_blank' download='path.json'>
-                    <button title='Save path' class='tool-button'>
-                        <p> Export Path </p>
-                    </button> 
-                </a>
-                
                 <!-- File inputs are notorious to style, so this is a workaround-->
-                <div class='tool-button file-input-container'>
-                    <p>Load Path</p>
-                    <input id='load-json-button' class='file-input-button' type='file'>
-                    </input>
-                </div>
 
-                <button id='clear-button' class='tool-button' onclick="animation.data.clear()">
-                    <p>Clear Path</p>
+                <button title='Previous example path' id='prev-path-button' class='tool-button' onclick="animation.data.prev_path();">
+                    <img src='imgs/icons/ic_prev_path_24px.svg'>
                 </button>
 
-                <div class='tool-button' class='file-input-container'> 
-                    <p>Add Grid</p>
-                    <input id='load-grid-button' class='file-input-button'  type='file'></input>
-                </div>
+                <button title='Next example path' id='next-path-button' class='tool-button' onclick="animation.data.prev_path();">
+                    <img src='imgs/icons/ic_next_path_24px.svg'>
+                </button>
 
+                <button title='Clear path' id='clear-button' class='tool-button' onclick="animation.data.clear()">
+                    <img src='./imgs/icons/ic_clear_path_24px.svg'>
+                </button>
+                
                 <button id='render-button' class='tool-button'>
                     Render Animation
                 </button>
 
+                <div id='dropdown'>
+                    <button id='dropdown-icon' class='tool-button'>
+                        <img src='./imgs/icons/ic_more_horiz_black_24px.svg'>
+                    </button>
+                    <div id='dropdown-list'>
+
+                        <div class='dropdown-button file-input-container'>
+                            <p>Add Path</p>
+                            <input id='load-json-button' class='file-input-button' type='file'>
+                        </div>
+                        
+                        <a id='save-json-button' href='default.json' target='_blank' download='path.json'>
+                            <div title='Save path' class='dropdown-button'>
+                                <p>Save Path</p>
+                            </div> 
+                        </a>
+
+                        <div class='dropdown-button file-input-container'> 
+                            <p>Add Grid</p>
+                            <input id='load-grid-button' class='file-input-button' type='file'>
+                        </div>
+                        
+                    </div>
+                </div>
+
             </div>
             
-            <div id='anim-windows' class='twelve columns' style="background-color:red;">
-                <canvas id='anim-grid' class='six columns' style="background-color:blue;"></canvas>
+            <div id='anim-windows' class='twelve columns' style="background-color:lightgrey;">
+                <canvas id='anim-grid' class='six columns' style="background-color:lightgrey;"></canvas>
                 <canvas id='anim-display' class='six columns'></canvas>
             </div>
 
